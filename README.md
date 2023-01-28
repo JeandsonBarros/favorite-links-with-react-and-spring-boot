@@ -3,7 +3,7 @@
     <img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white"/>
 </div>
 
-# API favorite links
+# API Favorite Links
 
 ## Go to branch:
 
@@ -16,7 +16,7 @@
 ## Description
 This API has the following functionality:
 
-- Authentication via token
+- Authentication by token
 - Send email to restore forgotten password
 - User management
 - Management of favorite links
