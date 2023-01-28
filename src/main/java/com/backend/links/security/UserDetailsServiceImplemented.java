@@ -1,8 +1,7 @@
 package com.backend.links.security;
 
-import com.backend.links.repository.UserEntityRepository;
+import com.backend.links.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -20,12 +19,12 @@ import java.util.Set;
 public class UserDetailsServiceImplemented implements UserDetailsService {
 
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserAuthRepository userAuthRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        var userEntity = userEntityRepository.findByEmail(username).orElseThrow(
+        var userEntity = userAuthRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException("User Not Found with username:" + username)
         );
 

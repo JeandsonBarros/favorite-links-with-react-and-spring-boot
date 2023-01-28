@@ -3,20 +3,19 @@ package com.backend.links.services;
 import com.backend.links.dto.LoginDTO;
 import com.backend.links.dto.SessaoDTO;
 import com.backend.links.dto.UserDTO;
-import com.backend.links.enums.Role;
-import com.backend.links.models.LinksFolderEntity;
-import com.backend.links.models.RoleEntity;
-import com.backend.links.models.UserEntity;
+import com.backend.links.enums.RoleEnum;
+import com.backend.links.models.Role;
+import com.backend.links.models.UserAuth;
 import com.backend.links.repository.LinksFolderRepository;
-import com.backend.links.repository.RoleEntityRepository;
-import com.backend.links.repository.UserEntityRepository;
+import com.backend.links.repository.RoleRepository;
+import com.backend.links.repository.UserAuthRepository;
 import com.backend.links.security.JWTCreator;
 import com.backend.links.security.JWTObject;
 import com.backend.links.security.JWTSecurityConfig;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,9 +32,9 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    private RoleEntityRepository roleEntityRepository;
+    private RoleRepository roleRepository;
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserAuthRepository userAuthRepository;
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
@@ -44,9 +43,18 @@ public class UserService {
     @Autowired
     private LinksFolderRepository linksFolderRepository;
 
+    public ResponseEntity<Object> getAllUsers(Pageable pageable) {
+        try {
+            return new ResponseEntity<>(userAuthRepository.findAll(pageable), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public ResponseEntity<Object> logar(@RequestBody LoginDTO login) {
 
-        Optional<UserEntity> user = userEntityRepository.findByEmail(login.getEmail());
+        Optional<UserAuth> user = userAuthRepository.findByEmail(login.getEmail());
 
         if (user.isPresent()) {
 
@@ -67,7 +75,7 @@ public class UserService {
             jwtObject.setExpiration((new Date(System.currentTimeMillis() + jwtSecurityConfig.getExpiration())));
 
             List<String> listRoles = new ArrayList<>();
-            for (RoleEntity item : user.get().getRoles()) {
+            for (Role item : user.get().getRoles()) {
                 String role = item.getRole();
                 listRoles.add(role);
             }
@@ -86,13 +94,13 @@ public class UserService {
     public ResponseEntity<Object> createUser(UserDTO userDTO) {
         try {
 
-            UserEntity newUser = new UserEntity();
+            UserAuth newUser = new UserAuth();
             BeanUtils.copyProperties(userDTO, newUser);
             newUser.setPassword(encoder.encode(userDTO.getPassword()));
-            Optional<RoleEntity> roleUser = roleEntityRepository.findByRole(Role.USER.toString());
+            Optional<Role> roleUser = roleRepository.findByRole(RoleEnum.USER.toString());
             newUser.setRoles(List.of(roleUser.get()));
 
-            UserEntity saveUser = userEntityRepository.save(newUser);
+            UserAuth saveUser = userAuthRepository.save(newUser);
 
             return new ResponseEntity<>(saveUser, HttpStatus.CREATED);
 
@@ -104,25 +112,7 @@ public class UserService {
 
     public ResponseEntity<Object> getUserData() {
         try {
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Optional<UserEntity> userEntity = userEntityRepository.findByEmail(auth.getName());
-            return new ResponseEntity<>(userEntity.get(), HttpStatus.OK);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public ResponseEntity<Object> deleteUserAccount() {
-        try {
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Optional<UserEntity> userEntity = userEntityRepository.findByEmail(auth.getName());
-            userEntityRepository.delete(userEntity.get());
-            return new ResponseEntity<>("account deleted", HttpStatus.OK);
-
+            return new ResponseEntity<>(getUserDataLogged(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -132,11 +122,10 @@ public class UserService {
     public ResponseEntity<Object> updateUserLogged(UserDTO userDTO) {
         try {
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            UserEntity userLogged = userEntityRepository.findByEmail(auth.getName()).get();
+            UserAuth userLogged = getUserDataLogged();
 
             if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
-                if (userEntityRepository.findByEmail(userDTO.getEmail()).isPresent() && !userDTO.getEmail().equals(userLogged.getEmail())) {
+                if (userAuthRepository.findByEmail(userDTO.getEmail()).isPresent() && !userDTO.getEmail().equals(userLogged.getEmail())) {
                     return new ResponseEntity<>("This email is unavailable", HttpStatus.BAD_REQUEST);
                 } else {
                     userLogged.setEmail(userDTO.getEmail());
@@ -148,7 +137,7 @@ public class UserService {
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty())
                 userLogged.setPassword(encoder.encode(userDTO.getPassword()));
 
-            userEntityRepository.save(userLogged);
+            userAuthRepository.save(userLogged);
 
             return new ResponseEntity<>("Successfully updated", HttpStatus.OK);
 
@@ -158,10 +147,41 @@ public class UserService {
         }
     }
 
-    public UserEntity getUserDataLogged(){
+    public ResponseEntity<Object> deleteUserAccount() {
+        try {
+
+            UserAuth userAuth = getUserDataLogged();
+            userAuthRepository.delete(userAuth);
+            return new ResponseEntity<>("account deleted", HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Object> deleteOneUser(String email) {
+        try {
+
+            Optional<UserAuth> userEntity = userAuthRepository.findByEmail(email);
+
+            if(!userEntity.isPresent())
+                return new ResponseEntity<>("User with email "+email+" not found ", HttpStatus.NOT_FOUND);
+
+            userAuthRepository.delete(userEntity.get());
+            return new ResponseEntity<>("account with email "+email+" deleted", HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public UserAuth getUserDataLogged() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<UserEntity> userEntity = userEntityRepository.findByEmail(auth.getName());
+        Optional<UserAuth> userEntity = userAuthRepository.findByEmail(auth.getName());
         return userEntity.get();
     }
+
 
 }

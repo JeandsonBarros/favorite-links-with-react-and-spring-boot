@@ -1,7 +1,7 @@
 package com.backend.links.security;
 
-import com.backend.links.models.RoleEntity;
-import com.backend.links.repository.UserEntityRepository;
+import com.backend.links.models.Role;
+import com.backend.links.repository.UserAuthRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,11 +20,11 @@ import java.util.Collection;
 
 public class JWTFilter extends OncePerRequestFilter {
 
-    UserEntityRepository userEntityRepository;
+    UserAuthRepository userAuthRepository;
     JWTSecurityConfig jwtSecurityConfig;
 
-    public JWTFilter(UserEntityRepository userEntityRepository, JWTSecurityConfig jwtSecurityConfig) {
-        this.userEntityRepository = userEntityRepository;
+    public JWTFilter(UserAuthRepository userAuthRepository, JWTSecurityConfig jwtSecurityConfig) {
+        this.userAuthRepository = userAuthRepository;
         this.jwtSecurityConfig = jwtSecurityConfig;
     }
 
@@ -41,7 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 JWTObject tokenObject = JWTCreator.create(token, jwtSecurityConfig.getPrefix(), jwtSecurityConfig.getKey());
 
-                var user = userEntityRepository.findById(tokenObject.getUserId());
+                var user = userAuthRepository.findById(tokenObject.getUserId());
 
                 if (!user.isPresent()){
                     response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -49,7 +49,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 }
 
                 Collection<GrantedAuthority> authorities = new ArrayList<>();
-                for(RoleEntity role: user.get().getRoles()) {
+                for(Role role: user.get().getRoles()) {
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.getRole());
                     authorities.add(authority);
                 }
@@ -71,6 +71,7 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
+            System.out.println("Error");
             e.printStackTrace();
             response.setStatus(HttpStatus.FORBIDDEN.value());
         }

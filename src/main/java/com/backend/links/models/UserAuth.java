@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "tab_user")
-public class UserEntity {
+public class UserAuth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
@@ -27,7 +27,7 @@ public class UserEntity {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @Column(name = "role_id")
-    private List<RoleEntity> roles = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -53,11 +53,11 @@ public class UserEntity {
         this.password = password;
     }
 
-    public List<RoleEntity> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<RoleEntity> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
@@ -71,7 +71,7 @@ public class UserEntity {
 
     @Override
     public String toString() {
-        return "UserEntity{" +
+        return "UserAuth{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +

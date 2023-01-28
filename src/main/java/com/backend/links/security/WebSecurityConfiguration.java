@@ -1,11 +1,10 @@
 package com.backend.links.security;
 
-import com.backend.links.repository.UserEntityRepository;
+import com.backend.links.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -26,26 +25,25 @@ import java.util.List;
 public class WebSecurityConfiguration {
 
     @Autowired
-    UserEntityRepository userEntityRepository;
+    UserAuthRepository userAuthRepository;
     @Autowired
     JWTSecurityConfig jwtSecurityConfig;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .addFilterAfter(new JWTFilter(userEntityRepository, jwtSecurityConfig), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JWTFilter(userAuthRepository, jwtSecurityConfig), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers("/").permitAll()
                 .requestMatchers(HttpMethod.POST, "/email-for-forgot-password/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ADMIN", "USER", "MASTER")
-                .requestMatchers("/admins").hasAnyAuthority("ADMIN", "MASTER")
-                .requestMatchers("/masters").hasAnyAuthority("MASTER")
+                .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/user/list-all-users").hasAnyAuthority("ADMIN", "MASTER")
+                .requestMatchers(HttpMethod.DELETE, "/user/delete-one-user/{email}").hasAnyAuthority( "MASTER")
                 .anyRequest().authenticated()
                 .and()
                 .cors()
-                .configurationSource(corsConfigurationSource())
-        /*.httpBasic()*/;
+                .configurationSource(corsConfigurationSource());
 
         return http.build();
     }

@@ -5,13 +5,11 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name="tab_links_folder")
-public class LinksFolderEntity {
+public class LinksFolder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -24,17 +22,18 @@ public class LinksFolderEntity {
     @ManyToOne
     @JoinColumn(name = "user_entity_id_user")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserEntity userEntity;
+    private UserAuth userAuth;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private Set<FavoriteLinkEntity> favoriteLinkEntities = new HashSet<>();
+    @JsonIgnore
+    @OneToMany
+    private List<FavoriteLink> favoriteLinks = new ArrayList<>();
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserAuth getUserEntity() {
+        return userAuth;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUserEntity(UserAuth userAuth) {
+        this.userAuth = userAuth;
     }
 
     public Long getId() {
@@ -53,16 +52,16 @@ public class LinksFolderEntity {
         this.name = name;
     }
 
-    public Set<FavoriteLinkEntity> getFavoriteLinkEntities() {
-        return favoriteLinkEntities;
+    public List<FavoriteLink> getFavoriteLinks() {
+        return favoriteLinks;
     }
 
-    public void setFavoriteLinkEntities(Set<FavoriteLinkEntity> favoriteLinkEntities) {
-        this.favoriteLinkEntities = favoriteLinkEntities;
+    public void setFavoriteLinks(List<FavoriteLink> favoriteLinks) {
+        this.favoriteLinks = favoriteLinks;
     }
 
-    public void setFavoriteLinkEntities(FavoriteLinkEntity favoriteLinkEntity) {
-        this.favoriteLinkEntities.add(favoriteLinkEntity);
+    public void setFavoriteLinkEntities(FavoriteLink favoriteLink) {
+        this.favoriteLinks.add(favoriteLink);
     }
 
     @Override
@@ -70,8 +69,8 @@ public class LinksFolderEntity {
         return "LinksFolderEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", userEntity=" + userEntity +
-                ", favoriteLinkEntities=" + favoriteLinkEntities +
+                ", userAuth=" + userAuth +
+                ", favoriteLinkEntities=" + favoriteLinks +
                 '}';
     }
 }

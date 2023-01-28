@@ -1,6 +1,6 @@
 package com.backend.links.enums;
 
-public enum Role {
+public enum RoleEnum {
     ADMIN,
     USER,
     MASTER

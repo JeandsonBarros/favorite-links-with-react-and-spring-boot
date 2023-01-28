@@ -1,13 +1,11 @@
 package com.backend.links.config;
 
-
-import com.backend.links.enums.Role;
-import com.backend.links.models.LinksFolderEntity;
-import com.backend.links.models.RoleEntity;
-import com.backend.links.models.UserEntity;
+import com.backend.links.enums.RoleEnum;
+import com.backend.links.models.Role;
+import com.backend.links.models.UserAuth;
 import com.backend.links.repository.LinksFolderRepository;
-import com.backend.links.repository.RoleEntityRepository;
-import com.backend.links.repository.UserEntityRepository;
+import com.backend.links.repository.RoleRepository;
+import com.backend.links.repository.UserAuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,10 +19,10 @@ import java.util.Optional;
 public class RoleConfigure implements CommandLineRunner {
 
     @Autowired
-    private RoleEntityRepository roleEntityRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserAuthRepository userAuthRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -38,30 +36,30 @@ public class RoleConfigure implements CommandLineRunner {
         try {
 
             List<String> rolesString = new ArrayList<>() {{
-                add(Role.ADMIN.toString());
-                add(Role.USER.toString());
-                add(Role.MASTER.toString());
+                add(RoleEnum.ADMIN.toString());
+                add(RoleEnum.USER.toString());
+                add(RoleEnum.MASTER.toString());
             }};
 
             rolesString.forEach(roleString -> {
-                Optional<RoleEntity> roleOptional = roleEntityRepository.findByRole(roleString);
+                Optional<Role> roleOptional = roleRepository.findByRole(roleString);
                 if (!roleOptional.isPresent()) {
-                    RoleEntity roleEntity = new RoleEntity();
-                    roleEntity.setRole(roleString);
-                    roleEntityRepository.save(roleEntity);
+                    Role role = new Role();
+                    role.setRole(roleString);
+                    roleRepository.save(role);
                 }
             });
 
-            Optional<UserEntity> userEntity = userEntityRepository.findByEmail("geoo677@gmail.com");
+            Optional<UserAuth> userEntity = userAuthRepository.findByEmail("geoo677@gmail.com");
             if(!userEntity.isPresent()){
 
-                UserEntity newUser = new UserEntity();
+                UserAuth newUser = new UserAuth();
                 newUser.setName("Jeandson Barros");
                 newUser.setEmail("geoo677@gmail.com");
                 newUser.setPassword(encoder.encode("zorosola"));
-                Optional<RoleEntity> roleMaster = roleEntityRepository.findByRole(Role.MASTER.toString());
+                Optional<Role> roleMaster = roleRepository.findByRole(RoleEnum.MASTER.toString());
                 newUser.setRoles(List.of(roleMaster.get()));
-                newUser= userEntityRepository.save(newUser);
+                newUser= userAuthRepository.save(newUser);
 
                 System.out.println("======= ACCOUNT MASTER CREATED =========");
                 System.out.println("ID: "+newUser.getId());

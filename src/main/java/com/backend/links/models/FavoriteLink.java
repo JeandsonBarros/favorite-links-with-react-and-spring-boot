@@ -6,7 +6,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-public class FavoriteLinkEntity {
+@Table(name = "tab_favorite_link")
+public class FavoriteLink {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
@@ -22,11 +23,11 @@ public class FavoriteLinkEntity {
     @ManyToOne
     @JoinColumn(name = "user_entity_id_user")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserEntity userEntity;
+    private UserAuth userAuth;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private LinksFolderEntity linksFolderEntity;
+    private LinksFolder linksFolder;
 
     public Long getId() {
         return id;
@@ -52,20 +53,20 @@ public class FavoriteLinkEntity {
         this.url = url;
     }
 
-    public LinksFolderEntity getLinksFolderEntity() {
-        return linksFolderEntity;
+    public LinksFolder getLinksFolder() {
+        return linksFolder;
     }
 
-    public void setLinksFolderEntity(LinksFolderEntity linksFolderEntity) {
-        this.linksFolderEntity = linksFolderEntity;
+    public void setLinksFolder(LinksFolder linksFolder) {
+        this.linksFolder = linksFolder;
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserAuth getUserEntity() {
+        return userAuth;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUserEntity(UserAuth userAuth) {
+        this.userAuth = userAuth;
     }
 
     @Override
@@ -74,8 +75,8 @@ public class FavoriteLinkEntity {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", url='" + url + '\'' +
-                ", userEntity=" + userEntity +
-                ", linksFolderEntity=" + linksFolderEntity +
+                ", userAuth=" + userAuth +
+                ", linksFolderEntity=" + linksFolder +
                 '}';
     }
 }
