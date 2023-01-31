@@ -1,0 +1,8 @@
+#redirectIcon {
+    display: none;
+}
+
+.favoriteLink:hover > #redirectIcon{
+    display: inline;
+    color: rgba(83, 83, 83, 0.719);
+}

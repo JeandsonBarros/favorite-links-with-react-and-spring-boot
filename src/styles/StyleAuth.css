@@ -1,0 +1,26 @@
+.userIconForm{
+    text-align: center;
+    font-size: 90px;
+    margin: 20px 0 0 0;
+}
+
+.formAuth {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+    margin: 15px auto;
+
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    border: solid 1px rgba(0, 255, 255, 0.473);
+
+}
+
+.formAuth>* {
+    margin-bottom: 20px;
+}
