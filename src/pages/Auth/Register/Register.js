@@ -1,10 +1,9 @@
 import { Button, Input, Loading } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BsEnvelopeFill, BsFillPersonFill, BsFillPersonLinesFill, BsLockFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import Alert from "../../../components/alert/Alert";
 import { userResgister } from "../../../services/AuthService";
-import { getToken } from "../../../services/TokenService";
 import "../../../styles/StyleAuth.css";
 
 function Register() {
@@ -18,15 +17,8 @@ function Register() {
     const [alertText, setAlertText] = useState('')
     const [visibleLoading, setVisibleLoading] = useState(false)
 
-    useEffect(() => {
-        if (getToken())
-            navigate('/')
-    }, [])
-
     async function registerUser(event) {
         event.preventDefault()
-
-        console.log(!email || !password || !name || !confirmPassword);
 
         if (!email || !password || !name || !confirmPassword) {
             setAlertText("Don't leave empty fields")

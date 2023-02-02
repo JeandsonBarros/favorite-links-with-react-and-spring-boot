@@ -1,4 +1,4 @@
-import { Button, Loading, Popover } from "@nextui-org/react";
+import { Button, Loading, Popover, Progress } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
@@ -91,7 +91,13 @@ function Links() {
             <Directory pathname={params.nameFolder} />
 
             <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-            {visibleLoading && <Loading type="points" />}
+            {visibleLoading &&
+                <Progress
+                    indeterminated
+                    value={50}
+                    color="primary"
+                    status="primary"
+                />}
 
             {favoriteLinks.length > 0 &&
                 <ListLinks

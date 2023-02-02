@@ -21,6 +21,26 @@ export async function getAllFolderLinks() {
     }
 }
 
+export async function findFolderLinks(nameFolder) {
+    try {
+
+        const response = await api.get(
+            `/links-folder?search=${nameFolder}`,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            }
+        )
+
+        return response.data;
+
+    } catch (error) {
+        console.log(error);
+        return error.response.data
+    }
+}
+
 export async function getFolderLinks(folderName) {
     try {
 

@@ -1,21 +1,30 @@
 import '../../../styles/StyleFavoriteLinks.css';
 
-import { Button, Loading, Popover, Row } from '@nextui-org/react';
+import { Button, Popover, Progress } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
-import { BsFillPlusCircleFill, BsFillTrashFill, BsPencilSquare } from 'react-icons/bs';
-import { MdFolder } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { BsFillPlusCircleFill } from 'react-icons/bs';
+import { useParams } from 'react-router-dom';
 
 import Alert from '../../../components/alert/Alert';
 import Directory from '../../../components/directory/Directory';
+import ListFolders from '../../../components/list-folders/ListFolders';
 import ListLinks from '../../../components/list-links/ListLinks';
-import { deleteFolderLinks, getAllFolderLinks, getDataFolderLinks, getFolderLinks, postFolderLinks, putFolderLinks } from '../../../services/LinksFolderService';
 import ModalFavoriteLink from '../../../components/modal-favorite-link/ModalFavoriteLink';
-import { deleteFavoriteLink, postFavoriteLink, putFavoriteLink } from '../../../services/FavoriteLinksService';
 import ModalFolderLinks from '../../../components/modal-folder-links/ModalFolderLinks';
+import { deleteFavoriteLink, findFavoriteLinks, postFavoriteLink, putFavoriteLink } from '../../../services/FavoriteLinksService';
+import {
+    deleteFolderLinks,
+    findFolderLinks,
+    getAllFolderLinks,
+    getDataFolderLinks,
+    getFolderLinks,
+    postFolderLinks,
+    putFolderLinks,
+} from '../../../services/LinksFolderService';
 
 function LinksAndFolders() {
 
+    const params = useParams()
     const [favoriteLinks, setFavoriteLinks] = useState([])
     const [folderLinks, setFolderLinks] = useState([])
     const [alertVisible, setAlertVisible] = useState(false)
@@ -24,12 +33,16 @@ function LinksAndFolders() {
     const [folderId, setFolderId] = useState(0)
 
     useEffect(() => {
-        getFavoriteLinksInRoot()
-        getTotalFolderLinks()
-        getDataFolder()
-    }, [])
 
-    async function getDataFolder(){
+        getFavoriteLinksInRoot()
+        getListFolderLinks()
+        getDataFolder()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [params])
+
+    
+    async function getDataFolder() {
         setVisibleLoading(true)
         const folderData = await getDataFolderLinks("root")
         setVisibleLoading(false)
@@ -43,10 +56,10 @@ function LinksAndFolders() {
         setAlertVisible(true)
     }
 
-    async function getTotalFolderLinks() {
+    async function getListFolderLinks() {
 
         setVisibleLoading(true)
-        let data = await getAllFolderLinks()
+        let data = params.name? await findFolderLinks(params.name) : await getAllFolderLinks()
         setVisibleLoading(false)
 
         const index = data.map(e => e.name).indexOf('root');
@@ -67,7 +80,7 @@ function LinksAndFolders() {
     async function getFavoriteLinksInRoot() {
 
         setVisibleLoading(true)
-        const data = await getFolderLinks("root")
+        const data = params.name? await findFavoriteLinks(params.name) : await getFolderLinks("root")
         setVisibleLoading(false)
 
         if (typeof (data) === 'object') {
@@ -84,7 +97,7 @@ function LinksAndFolders() {
         setVisibleLoading(true)
         const data = await postFavoriteLink(name, url, folderId)
         await getFavoriteLinksInRoot()
-        await getTotalFolderLinks()
+        await getListFolderLinks()
         setVisibleLoading(false)
 
         setAlertText(data)
@@ -92,11 +105,11 @@ function LinksAndFolders() {
     }
 
     async function saveFolderLinks(folderName) {
-       
+
         setVisibleLoading(true)
         const data = await postFolderLinks(folderName)
         await getFavoriteLinksInRoot()
-        await getTotalFolderLinks()
+        await getListFolderLinks()
         setVisibleLoading(false)
 
         setAlertText(data)
@@ -109,7 +122,7 @@ function LinksAndFolders() {
         setVisibleLoading(true)
         const data = await putFolderLinks(newFolderName, id)
         await getFavoriteLinksInRoot()
-        await getTotalFolderLinks()
+        await getListFolderLinks()
         setVisibleLoading(false)
 
         setAlertText(data)
@@ -120,7 +133,7 @@ function LinksAndFolders() {
         setVisibleLoading(true)
         const data = await deleteFolderLinks(id)
         await getFavoriteLinksInRoot()
-        await getTotalFolderLinks()
+        await getListFolderLinks()
         setVisibleLoading(false)
 
         setAlertText(data)
@@ -132,7 +145,7 @@ function LinksAndFolders() {
         const data = await putFavoriteLink(name, url, folderId, id)
         await getFavoriteLinksInRoot()
         setVisibleLoading(false)
-        
+
         setAlertText(data)
         setAlertVisible(true)
 
@@ -143,7 +156,7 @@ function LinksAndFolders() {
         const data = await deleteFavoriteLink(id)
         await getFavoriteLinksInRoot()
         setVisibleLoading(false)
-       
+
         setAlertText(data)
         setAlertVisible(true)
     }
@@ -154,63 +167,22 @@ function LinksAndFolders() {
             <Directory pathname="/" />
 
             <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-            {visibleLoading && <Loading type="points" />}
+            {visibleLoading &&
+                <Progress
+                    indeterminated
+                    value={50}
+                    color="primary"
+                    status="primary"
+                />}
 
-            <div className="listLinksAndFolders">
-                {/* List folder links */}
-                {folderLinks.length > 0 &&
-                    folderLinks.map(folder => {
-                        return (
-                            <Row
-                                align="center"
-                                key={folder.id}
-                                css={{ borderBottom: "solid 1px #80808065", p: 10 }}
-                            >
-
-                                <Link to={`/${folder.name}`} >
-                                    <MdFolder style={{ fontSize: 25, margin: 10 }} />
-                                    {folder.name}
-                                </Link>
-
-                                <Row justify="flex-end">
-
-                                    <ModalFolderLinks
-                                        title="Update link"
-                                        name={folder.name}
-                                        action={(newFolderName) => {
-                                            updateFolderLinks(newFolderName, folder.id)
-                                        }}
-                                        showButtonRender={({ click }) => (
-                                            <Button
-                                                auto
-                                                css={{ marginRight: 10 }}
-                                                color="warning"
-                                                flat
-                                                title="Update link"
-                                                shadow
-                                                onPress={click}>
-                                                <BsPencilSquare />
-                                            </Button>
-                                        )}
-                                    />
-
-                                    <Button
-                                        auto
-                                        css={{ marginRight: 10 }}
-                                        color="error"
-                                        flat
-                                        title="Delete link"
-                                        shadow
-                                        onPress={() => removeFolderLinks(folder.id)}
-                                    >
-                                        <BsFillTrashFill />
-                                    </Button>
-                                </Row>
-                            </Row>
-                        )
-                    })
-                }
-            </div>
+            {/* List folder links */}
+            {folderLinks.length > 0 &&
+                <ListFolders
+                    folderLinks={folderLinks}
+                    updateFolderLinks={updateFolderLinks}
+                    removeFolderLinks={removeFolderLinks}
+                />
+            }
 
             {/* List links that have no folder */}
             {favoriteLinks.length > 0 &&
@@ -239,6 +211,7 @@ function LinksAndFolders() {
                         }}
                     />
                 </Popover.Trigger>
+
                 <Popover.Content>
 
                     <ModalFavoriteLink

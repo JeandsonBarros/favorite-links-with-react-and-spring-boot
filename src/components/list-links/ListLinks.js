@@ -34,6 +34,7 @@ function ListLinks({ listFavoriteLinks, updateFavoriteLink, removeFavoriteLink }
                                 </a>
                             </div>
                         </Row>
+                        
                         <Row justify="flex-end">
                             <ModalFavoriteLink
                                 title="Update link"

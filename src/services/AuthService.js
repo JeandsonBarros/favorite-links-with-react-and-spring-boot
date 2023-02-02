@@ -47,13 +47,14 @@ export async function getUserData() {
 
     } catch (error) {
         console.log(error);
+        return error.response.data
     }
 }
 
 export async function putUser(user) {
     try {
 
-        const response = await api.put('/user/update', user,
+        const response = await api.patch('/user/update', user,
             {
                 headers: {
                     'Authorization': getToken(),
@@ -65,7 +66,7 @@ export async function putUser(user) {
 
     } catch (error) {
         console.log(error);
-        return "Error updating"
+        return error.response.data
     }
 }
 
@@ -82,7 +83,7 @@ export async function deleteUser() {
         return response.status
     } catch (error) {
         console.log(error);
-        return error.status
+        return error.response.data
     }
 }
 

@@ -97,9 +97,9 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
 
           <hr />
 
-          <div>
+         {!folderId && <div>
 
-            <h5>Select one folder</h5>
+            <h5>Update folder</h5>
             <small>If you don't select a folder, the link will be saved in the root folders</small>
 
             <div style={{ maxHeight: 200, overflowY: 'auto' }}>
@@ -114,7 +114,7 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
               ))}
             </div>
 
-          </div>
+          </div>}
 
         </Modal.Body>
         <Modal.Footer>

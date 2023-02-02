@@ -21,6 +21,26 @@ export async function getAllFavoriteLinks() {
     }
 }
 
+export async function findFavoriteLinks(name) {
+    try {
+
+        const response = await api.get(
+            `/favorite-link?search=${name}`,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            }
+        )
+
+        return response.data;
+
+    } catch (error) {
+        console.log(error);
+        return error.response.data
+    }
+}
+
 export async function postFavoriteLink(name, url, folderId) {
     try {
 

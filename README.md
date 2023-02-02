@@ -1,4 +1,4 @@
-# API favorite links
+# Front-end favorite links by React.Js
 
 ## Go to branch:
 
@@ -7,3 +7,4 @@
 - <a href="https://github.com/JeandsonBarros/favorite-links-with-react-and-spring-boot/tree/front-end">Front-end</a><br/>
 - <a href="https://github.com/JeandsonBarros/favorite-links-with-react-and-spring-boot/tree/mobile">Mobile</a><br/>
 </div>
+

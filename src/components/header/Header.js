@@ -22,7 +22,7 @@ function Header({ isDarkTheme, changeTheme }) {
     }, [location.pathname])
 
     return (
-        <Navbar isBordered variant="sticky" css={{zIndex: "999"}}>
+        <Navbar isBordered variant="sticky" css={{ zIndex: "999" }}>
             <Navbar.Brand>
                 <Button light auto onPress={() => navigation("/")}>
                     <BsFillBookmarkStarFill style={{ marginRight: 5, fontSize: 23 }} />
@@ -31,16 +31,22 @@ function Header({ isDarkTheme, changeTheme }) {
                     </Text>
                 </Button>
             </Navbar.Brand>
-            {/* {visibleRight &&
+            {visibleRight &&
                 <Navbar.Content hideIn="xs">
                     <Input
                         aria-label="search"
-                        placeholder="Search link by name"
+                        placeholder="Search by name"
                         contentLeft={<BsSearch />}
                         fullWidth
+                        onChange={event => {
+                            if (event.target.value.length > 0)
+                                navigation(`/search/${event.target.value}`)
+                            else
+                                navigation(`/`)
+                        }}
                     />
                 </Navbar.Content>
-            } */}
+            }
             <Navbar.Content>
                 <Button
                     onPress={changeTheme}

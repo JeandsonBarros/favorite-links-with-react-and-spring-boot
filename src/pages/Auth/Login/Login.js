@@ -1,10 +1,9 @@
-import { Button, Input, Container, Loading } from '@nextui-org/react';
+import { Button, Input, Loading } from '@nextui-org/react';
 import { BsEnvelopeFill, BsFillPersonFill, BsLockFill } from "react-icons/bs";
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import "./StyleLogin.css";
 import "../../../styles/StyleAuth.css";
-import { getToken } from '../../../services/TokenService';
 import { login } from '../../../services/AuthService';
 import Alert from '../../../components/alert/Alert';
 
@@ -17,18 +16,12 @@ function Login() {
     const [alertText, setAlertText] = useState('')
     const [visibleLoading, setVisibleLoading] = useState(false)
 
-
-    useEffect(() => {
-        if (getToken())
-            navigate('/')
-    }, [])
-
     async function loginUser(event) {
         event.preventDefault()
 
         if (!email || !password) {
             setAlertText("Don't leave empty fields")
-            alertVisible(true)
+            setAlertVisible(true)
             return
         }
 

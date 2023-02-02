@@ -8,6 +8,9 @@ import Footer from "./components/footer/Footer";
 import UserData from "./pages/Auth/user-data/UserData";
 import LinksAndFolders from "./pages/FavoriteLinks/links-and-folders/LinksAndFolders";
 import Links from "./pages/FavoriteLinks/links/Links";
+import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword";
+import ChangeForgotPassword from "./pages/Auth/forgot-password/ChangeForgotPassword";
+import Container from "./pages/Container/Container";
 
 const dark = createTheme({
   type: "dark", // it could be "light" or "dark"
@@ -97,20 +100,23 @@ function App() {
           }}
         />
 
-        <main style={{ minHeight: "100vh" }} >
+        <Container>
 
           <Routes>
 
             <Route path='*' element={<h1> 404 - Page not found</h1>} />
             <Route path='/' element={<LinksAndFolders />} />
             <Route path='/:nameFolder' element={<Links />} />
+            <Route path='/search/:name'  element={<LinksAndFolders />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/user-data" element={<UserData />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/change-forgot-password" element={<ChangeForgotPassword />} />
 
           </Routes>
 
-        </main>
+        </Container>
 
         <Footer />
 
