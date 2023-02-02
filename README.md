@@ -5,6 +5,8 @@
 
 # API Favorite Links
 
+Application developed with React.js on the web front-end, React Native on mobile and Spring Boot on the back-end, to manage favorite links.
+
 ## Go to branch:
 
 <div>

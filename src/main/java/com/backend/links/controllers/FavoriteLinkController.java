@@ -32,15 +32,12 @@ public class FavoriteLinkController {
 
     @Operation(summary = "Get saved bookmark links | Authority: ADMIN, MASTER, USER")
     @GetMapping
-    public ResponseEntity<Object> getFavoritesLinks(@PageableDefault(size = 30, page = 0) Pageable paging, @RequestParam(required = false) String search) {
-
-        Pageable pageable = PageRequest.of(paging.getPageNumber(), paging.getPageSize(), Sort.by(
-                Sort.Order.asc("name")));
+    public ResponseEntity<Object> getFavoritesLinks(@RequestParam(required = false) String search) {
 
         if(search != null)
-           return favoriteLinkService.findLinkByName(search, pageable);
+           return favoriteLinkService.findLinkByName(search);
 
-        return favoriteLinkService.getAllLinks(pageable);
+        return favoriteLinkService.getAllLinks();
 
     }
 

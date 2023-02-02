@@ -28,11 +28,11 @@ public class LinksFolder {
     @OneToMany
     private List<FavoriteLink> favoriteLinks = new ArrayList<>();
 
-    public UserAuth getUserEntity() {
+    public UserAuth getUserAuth() {
         return userAuth;
     }
 
-    public void setUserEntity(UserAuth userAuth) {
+    public void setUserAuth(UserAuth userAuth) {
         this.userAuth = userAuth;
     }
 

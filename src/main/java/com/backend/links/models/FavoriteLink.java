@@ -27,6 +27,7 @@ public class FavoriteLink {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(nullable = false)
     private LinksFolder linksFolder;
 
     public Long getId() {

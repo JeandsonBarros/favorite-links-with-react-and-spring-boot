@@ -24,9 +24,9 @@ public class FavoriteLinkService {
     @Autowired
     private FavoriteLinkRepository favoriteLinkRepository;
 
-    public ResponseEntity<Object> getAllLinks(Pageable pageable) {
+    public ResponseEntity<Object> getAllLinks() {
         try {
-            return new ResponseEntity<>(favoriteLinkRepository.findByUserAuth(userService.getUserDataLogged(), pageable), HttpStatus.OK);
+            return new ResponseEntity<>(favoriteLinkRepository.findByUserAuth(userService.getUserDataLogged()), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("error getting list of links", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -50,9 +50,9 @@ public class FavoriteLinkService {
         }
     }
 
-    public ResponseEntity<Object> findLinkByName(String search, Pageable pageable) {
+    public ResponseEntity<Object> findLinkByName(String search) {
         try {
-            return new ResponseEntity<>(favoriteLinkRepository.findByUserAuthAndNameContaining(userService.getUserDataLogged(), search, pageable), HttpStatus.OK);
+            return new ResponseEntity<>(favoriteLinkRepository.findByUserAuthAndNameContaining(userService.getUserDataLogged(), search), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("error fetching list of links", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -72,6 +72,9 @@ public class FavoriteLinkService {
                     favoriteLink.setLinksFolder(folder.get());
                 else
                     return new ResponseEntity<>("folder not found", HttpStatus.NOT_FOUND);
+            }else{
+                Optional<LinksFolder> folder = linksFolderRepository.findByUserAuthAndName(userService.getUserDataLogged(), "root");
+                favoriteLink.setLinksFolder(folder.get());
             }
 
             favoriteLink = favoriteLinkRepository.save(favoriteLink);
@@ -106,9 +109,10 @@ public class FavoriteLinkService {
                     favoriteLink.get().setLinksFolder(folderLinks.get());
                 else
                     return new ResponseEntity<>("folder by id "+favoriteLinkDTO.getFolderId()+" not found", HttpStatus.NOT_FOUND);
-            }else
-                favoriteLink.get().setLinksFolder(null);
-
+            }else{
+                Optional<LinksFolder> folder = linksFolderRepository.findByUserAuthAndName(userService.getUserDataLogged(), "root");
+                favoriteLink.get().setLinksFolder(folder.get());
+            }
 
             favoriteLinkRepository.save(favoriteLink.get());
 

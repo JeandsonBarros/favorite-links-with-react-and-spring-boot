@@ -13,9 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface FavoriteLinkRepository extends JpaRepository<FavoriteLink, Long> {
-    Page<FavoriteLink> findByUserAuth(UserAuth userAuth, Pageable pageable);
-    Page<FavoriteLink> findByUserAuthAndLinksFolder(UserAuth userAuth, LinksFolder linksFolder, Pageable pageable);
+    List<FavoriteLink> findByUserAuth(UserAuth userAuth);
     List<FavoriteLink> findByUserAuthAndLinksFolder(UserAuth userAuth, LinksFolder linksFolder);
-    Page<FavoriteLink> findByUserAuthAndNameContaining(UserAuth userAuth, String name, Pageable pageable);
+    List<FavoriteLink> findByUserAuthAndNameContaining(UserAuth userAuth, String name);
     Optional<FavoriteLink> findByUserAuthAndId(UserAuth userAuth, Long id);
 }

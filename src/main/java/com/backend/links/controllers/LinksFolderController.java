@@ -28,31 +28,25 @@ public class LinksFolderController {
 
     @Operation(summary = "Get all link folders | Authority: ADMIN, MASTER, USER")
     @GetMapping
-    public ResponseEntity<Object> getFolders(@PageableDefault(size = 30, page = 0) Pageable paging, @RequestParam(required = false) String search){
-
-        Pageable pageable = PageRequest.of(paging.getPageNumber(), paging.getPageSize(), Sort.by(
-                Sort.Order.asc("name")));
+    public ResponseEntity<Object> getFolders(@RequestParam(required = false) String search){
 
         if(search != null)
-            return linksFolderService.findFolder(search, pageable);
+            return linksFolderService.findFolder(search);
 
-        return linksFolderService.getAllFolders(pageable);
+        return linksFolderService.getAllFolders();
     }
 
     @Operation(summary = "Get link folder info | Authority: ADMIN, MASTER, USER")
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getOneFolder(@PathVariable Long id){
-        return linksFolderService.getOneFolder(id);
+    @GetMapping("/{folderName}")
+    public ResponseEntity<Object> getOneFolder(@PathVariable String folderName){
+        return linksFolderService.getOneFolder(folderName);
     }
 
     @Operation(summary = "Get links from a folder of links by id | Authority: ADMIN, MASTER, USER")
-    @GetMapping("/get-folder-links/{id}")
-    public ResponseEntity<Object> getFolderLinks(@PageableDefault(size = 30, page = 0) Pageable paging, @PathVariable Long id){
+    @GetMapping("/get-folder-links/{folderName}")
+    public ResponseEntity<Object> getFolderLinks(@PathVariable String folderName){
 
-        Pageable pageable = PageRequest.of(paging.getPageNumber(), paging.getPageSize(), Sort.by(
-                Sort.Order.asc("name")));
-
-        return linksFolderService.getFolderLinks(id, pageable);
+        return linksFolderService.getFolderLinks(folderName);
     }
 
     @Operation(summary = "Save a link folder | Authority: ADMIN, MASTER, USER")

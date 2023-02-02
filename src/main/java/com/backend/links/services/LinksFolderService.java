@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,20 +26,20 @@ public class LinksFolderService {
     @Autowired
     private FavoriteLinkRepository favoriteLinkRepository;
 
-    public ResponseEntity<Object> getAllFolders(Pageable pageable) {
+    public ResponseEntity<Object> getAllFolders() {
         try {
             UserAuth userAuth = userService.getUserDataLogged();
-            return new ResponseEntity<>(linksFolderRepository.findByUserAuth(userAuth, pageable), HttpStatus.OK);
+            return new ResponseEntity<>(linksFolderRepository.findByUserAuth(userAuth), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<Object> getOneFolder(Long id) {
+    public ResponseEntity<Object> getOneFolder(String folderName) {
         try {
 
-            Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndId(userService.getUserDataLogged(), id);
+            Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndName(userService.getUserDataLogged(), folderName);
 
             if(!linksFolder.isPresent())
                 return new ResponseEntity<>("folder not found", HttpStatus.NOT_FOUND);
@@ -50,15 +51,15 @@ public class LinksFolderService {
         }
     }
 
-    public ResponseEntity<Object> getFolderLinks(Long id,  Pageable pageable) {
+    public ResponseEntity<Object> getFolderLinks(String folderName) {
         try {
 
-            Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndId(userService.getUserDataLogged(), id);
+            Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndName(userService.getUserDataLogged(), folderName);
 
             if(!linksFolder.isPresent())
                 return new ResponseEntity<>("folder not found", HttpStatus.NOT_FOUND);
 
-            Page<FavoriteLink> favoriteLinkEntities = favoriteLinkRepository.findByUserAuthAndLinksFolder(userService.getUserDataLogged(), linksFolder.get(), pageable);
+            List<FavoriteLink> favoriteLinkEntities = favoriteLinkRepository.findByUserAuthAndLinksFolder(userService.getUserDataLogged(), linksFolder.get());
 
             return new ResponseEntity<>(favoriteLinkEntities, HttpStatus.OK);
         } catch (Exception e) {
@@ -72,8 +73,11 @@ public class LinksFolderService {
 
             UserAuth userAuth = userService.getUserDataLogged();
 
+            if(linksFolderRepository.findByUserAuthAndName(userAuth, linksFolderName).isPresent())
+                return new ResponseEntity<>("A folder with that name already exists", HttpStatus.BAD_REQUEST);
+
             LinksFolder linksFolder = new LinksFolder();
-            linksFolder.setUserEntity(userAuth);
+            linksFolder.setUserAuth(userAuth);
             linksFolder.setName(linksFolderName);
             linksFolder = linksFolderRepository.save(linksFolder);
 
@@ -91,8 +95,14 @@ public class LinksFolderService {
 
             Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndId(userService.getUserDataLogged(), id);
 
+            if(linksFolderRepository.findByUserAuthAndName(userService.getUserDataLogged(), linksFolderName).isPresent())
+                return new ResponseEntity<>("A folder with that name already exists", HttpStatus.BAD_REQUEST);
+
             if(!linksFolder.isPresent())
                 return new ResponseEntity<>("folder not found", HttpStatus.NOT_FOUND);
+
+            if(linksFolder.get().getName().equals("root"))
+                return new ResponseEntity<>("Root folder cannot be changed", HttpStatus.BAD_REQUEST);
 
             linksFolder.get().setName(linksFolderName);
             linksFolderRepository.save(linksFolder.get());
@@ -114,6 +124,9 @@ public class LinksFolderService {
             if(!linksFolder.isPresent())
                 return new ResponseEntity<>("folder not found", HttpStatus.NOT_FOUND);
 
+            if(linksFolder.get().getName().equals("root"))
+                return new ResponseEntity<>("Root folder cannot be deleted", HttpStatus.BAD_REQUEST);
+
             linksFolderRepository.delete(linksFolder.get());
 
             return new ResponseEntity<>("folder deleted", HttpStatus.OK);
@@ -124,10 +137,10 @@ public class LinksFolderService {
         }
     }
 
-    public ResponseEntity<Object> findFolder(String name, Pageable pageable) {
+    public ResponseEntity<Object> findFolder(String name) {
         try {
             UserAuth userAuth = userService.getUserDataLogged();
-            return new ResponseEntity<>(linksFolderRepository.findByUserAuthAndNameContaining(userAuth, name, pageable), HttpStatus.OK);
+            return new ResponseEntity<>(linksFolderRepository.findByUserAuthAndNameContaining(userAuth, name), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,7 @@
 package com.backend.links.config;
 
 import com.backend.links.enums.RoleEnum;
+import com.backend.links.models.LinksFolder;
 import com.backend.links.models.Role;
 import com.backend.links.models.UserAuth;
 import com.backend.links.repository.LinksFolderRepository;
@@ -20,13 +21,10 @@ public class RoleConfigure implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private UserAuthRepository userAuthRepository;
-
     @Autowired
     private PasswordEncoder encoder;
-
     @Autowired
     private LinksFolderRepository linksFolderRepository;
 
@@ -51,7 +49,7 @@ public class RoleConfigure implements CommandLineRunner {
             });
 
             Optional<UserAuth> userEntity = userAuthRepository.findByEmail("geoo677@gmail.com");
-            if(!userEntity.isPresent()){
+            if (!userEntity.isPresent()) {
 
                 UserAuth newUser = new UserAuth();
                 newUser.setName("Jeandson Barros");
@@ -59,12 +57,17 @@ public class RoleConfigure implements CommandLineRunner {
                 newUser.setPassword(encoder.encode("zorosola"));
                 Optional<Role> roleMaster = roleRepository.findByRole(RoleEnum.MASTER.toString());
                 newUser.setRoles(List.of(roleMaster.get()));
-                newUser= userAuthRepository.save(newUser);
+                newUser = userAuthRepository.save(newUser);
+
+                LinksFolder linksFolder = new LinksFolder();
+                linksFolder.setName("root");
+                linksFolder.setUserAuth(newUser);
+                linksFolderRepository.save(linksFolder);
 
                 System.out.println("======= ACCOUNT MASTER CREATED =========");
-                System.out.println("ID: "+newUser.getId());
-                System.out.println("Name: "+newUser.getName());
-                System.out.println("Email: "+newUser.getEmail());
+                System.out.println("ID: " + newUser.getId());
+                System.out.println("Name: " + newUser.getName());
+                System.out.println("Email: " + newUser.getEmail());
                 System.out.println("Password: zorosola");
                 System.out.println("Role: MASTER");
                 System.out.println("========================================");

@@ -4,6 +4,7 @@ import com.backend.links.dto.LoginDTO;
 import com.backend.links.dto.SessaoDTO;
 import com.backend.links.dto.UserDTO;
 import com.backend.links.enums.RoleEnum;
+import com.backend.links.models.LinksFolder;
 import com.backend.links.models.Role;
 import com.backend.links.models.UserAuth;
 import com.backend.links.repository.LinksFolderRepository;
@@ -94,15 +95,23 @@ public class UserService {
     public ResponseEntity<Object> createUser(UserDTO userDTO) {
         try {
 
+            if(userAuthRepository.findByEmail(userDTO.getEmail()).isPresent())
+                return new ResponseEntity<>("There is already a registered user with this email", HttpStatus.BAD_REQUEST);
+
             UserAuth newUser = new UserAuth();
             BeanUtils.copyProperties(userDTO, newUser);
             newUser.setPassword(encoder.encode(userDTO.getPassword()));
             Optional<Role> roleUser = roleRepository.findByRole(RoleEnum.USER.toString());
             newUser.setRoles(List.of(roleUser.get()));
 
-            UserAuth saveUser = userAuthRepository.save(newUser);
+            newUser = userAuthRepository.save(newUser);
 
-            return new ResponseEntity<>(saveUser, HttpStatus.CREATED);
+            LinksFolder linksFolder = new LinksFolder();
+            linksFolder.setName("root");
+            linksFolder.setUserAuth(newUser);
+            linksFolderRepository.save(linksFolder);
+
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
 
         } catch (Exception e) {
             e.printStackTrace();

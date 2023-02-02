@@ -18,8 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 @RestController
@@ -73,9 +71,8 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<Object> putUserLogged(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
 
-        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty())
-            if (result.hasFieldErrors("email"))
-                return new ResponseEntity<>("must be a well-formed email address", HttpStatus.BAD_REQUEST);
+        if (result.hasErrors())
+            return listErrors(result);
 
         return userService.updateUserLogged(userDTO);
     }
@@ -85,8 +82,9 @@ public class UserController {
     @PatchMapping("/update")
     public ResponseEntity<Object> patchUserLogged(@Valid @RequestBody UserDTO userDTO, BindingResult result) {
 
-        if (result.hasErrors())
-            return listErrors(result);
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty())
+            if (result.hasFieldErrors("email"))
+                return new ResponseEntity<>("must be a well-formed email address", HttpStatus.BAD_REQUEST);
 
         return userService.updateUserLogged(userDTO);
     }
