@@ -30,25 +30,35 @@ function LinksAndFolders() {
     const [alertVisible, setAlertVisible] = useState(false)
     const [alertText, setAlertText] = useState('')
     const [visibleLoading, setVisibleLoading] = useState(false)
-    const [folderId, setFolderId] = useState(0)
+    const [folderRootId, setFolderRootId] = useState()
+    const [visibleModalNewFolder, setVisibleModalNewFolder] = useState(false)
+    const [visibleModalNewLink, setVisibleModalNewLink] = useState(false)
+    const [popoverIsOpen, setPopoverIsOpen] = useState(false)
 
     useEffect(() => {
 
-        getFavoriteLinksInRoot()
-        getListFolderLinks()
-        getDataFolder()
+        gets()
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params])
 
-    
-    async function getDataFolder() {
+
+    async function gets() {
+
         setVisibleLoading(true)
-        const folderData = await getDataFolderLinks("root")
+        await getFavoriteLinksInRoot()
+        await getListFolderLinks()
+        await getDataRootFolder()
         setVisibleLoading(false)
 
+    }
+
+    async function getDataRootFolder() {
+
+        const folderData = await getDataFolderLinks("root")
+
         if (typeof (folderData) === 'object') {
-            setFolderId(folderData.id)
+            setFolderRootId(folderData.id)
             return
         }
 
@@ -58,16 +68,15 @@ function LinksAndFolders() {
 
     async function getListFolderLinks() {
 
-        setVisibleLoading(true)
-        let data = params.name? await findFolderLinks(params.name) : await getAllFolderLinks()
-        setVisibleLoading(false)
-
-        const index = data.map(e => e.name).indexOf('root');
-        if (index > -1) { // only splice array when item is found
-            data.splice(index, 1); // 2nd parameter means remove one item only
-        }
+        let data = params.name ? await findFolderLinks(params.name) : await getAllFolderLinks()
 
         if (typeof (data) === 'object') {
+
+            const index = data.map(e => e.name).indexOf('root');
+            if (index > -1) { // only splice array when item is found
+                data.splice(index, 1); // 2nd parameter means remove one item only
+            }
+
             setFolderLinks(data)
             return
         }
@@ -79,9 +88,7 @@ function LinksAndFolders() {
 
     async function getFavoriteLinksInRoot() {
 
-        setVisibleLoading(true)
-        const data = params.name? await findFavoriteLinks(params.name) : await getFolderLinks("root")
-        setVisibleLoading(false)
+        const data = params.name ? await findFavoriteLinks(params.name) : await getFolderLinks("root")
 
         if (typeof (data) === 'object') {
             setFavoriteLinks(data)
@@ -141,6 +148,7 @@ function LinksAndFolders() {
     }
 
     async function updateFavoriteLink(name, url, folderId, id) {
+
         setVisibleLoading(true)
         const data = await putFavoriteLink(name, url, folderId, id)
         await getFavoriteLinksInRoot()
@@ -193,7 +201,23 @@ function LinksAndFolders() {
                     removeFavoriteLink={removeFavoriteLink}
                 />}
 
-            <Popover placement="top" isDismissable={false}>
+            {folderRootId && <ModalFavoriteLink
+                title="+ New favorite link"
+                action={saveFavoriteLinks}
+                folderId={folderRootId}
+                visible={visibleModalNewLink}
+                closeHandler={() => setVisibleModalNewLink(false)}
+            />}
+
+            <ModalFolderLinks
+                action={saveFolderLinks}
+                title="+ New links folder"
+                visible={visibleModalNewFolder}
+                closeHandler={() => setVisibleModalNewFolder(false)}
+            />
+
+            <Popover placement="top" isOpen={popoverIsOpen} onClose={()=>setPopoverIsOpen(false)}> 
+
                 <Popover.Trigger>
                     <Button
                         rounded
@@ -201,6 +225,7 @@ function LinksAndFolders() {
                         color="primary"
                         shadow
                         icon={<BsFillPlusCircleFill style={{ fontSize: 50 }} />}
+                        onPress={() => setPopoverIsOpen(true)}
                         css={{
                             position: "fixed",
                             bottom: 80,
@@ -214,24 +239,26 @@ function LinksAndFolders() {
 
                 <Popover.Content>
 
-                    <ModalFavoriteLink
-                        title="+ New favorite link"
-                        action={saveFavoriteLinks}
-                        folderId={folderId}
-                        showButtonRender={({ click }) => (
-                            <Button light onPress={click}>+ New favorite link</Button>
-                        )}
-                    />
+                    <Button
+                        light
+                        onPress={() => {
+                            setPopoverIsOpen(false)
+                            setVisibleModalNewLink(true)
+                        }}>
+                        + New favorite link
+                    </Button>
 
-                    <ModalFolderLinks
-                        action={saveFolderLinks}
-                        title="+ New links folder"
-                        showButtonRender={({ click }) => (
-                            <Button light onPress={click}>+ New links folder</Button>
-                        )}
-                    />
+                    <Button
+                        light
+                        onPress={() => {
+                            setPopoverIsOpen(false)
+                            setVisibleModalNewFolder(true)
+                        }}>
+                        + New links folder
+                    </Button>
 
                 </Popover.Content>
+
             </Popover>
 
         </div>

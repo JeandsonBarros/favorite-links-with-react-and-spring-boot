@@ -17,7 +17,7 @@ export async function getAllFavoriteLinks() {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
@@ -37,7 +37,7 @@ export async function findFavoriteLinks(name) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
@@ -58,14 +58,14 @@ export async function postFavoriteLink(name, url, folderId) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
 export async function putFavoriteLink(name, url, folderId, id) {
     try {
-
-       await api.put(
+       
+        await api.put(
             `/favorite-link/${id}`,
             { name, url, folderId },
             {
@@ -79,7 +79,7 @@ export async function putFavoriteLink(name, url, folderId, id) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
@@ -99,6 +99,6 @@ export async function deleteFavoriteLink(id) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }

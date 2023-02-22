@@ -17,7 +17,7 @@ export async function getAllFolderLinks() {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -37,7 +37,7 @@ export async function findFolderLinks(nameFolder) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -57,7 +57,7 @@ export async function getFolderLinks(folderName) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -77,7 +77,7 @@ export async function getDataFolderLinks(folderName) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -98,7 +98,7 @@ export async function postFolderLinks(folderName) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -119,7 +119,7 @@ export async function putFolderLinks(newFolderName, id) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }
 
@@ -139,6 +139,6 @@ export async function deleteFolderLinks(id) {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response? error.response.data : "Error"
     }
 }

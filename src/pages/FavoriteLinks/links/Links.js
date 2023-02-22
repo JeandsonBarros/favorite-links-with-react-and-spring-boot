@@ -1,4 +1,4 @@
-import { Button, Loading, Popover, Progress } from "@nextui-org/react";
+import { Button, Popover, Progress } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { useLocation, useParams } from "react-router-dom";
@@ -14,18 +14,20 @@ function Links() {
     const location = useLocation()
     const params = useParams();
     const [favoriteLinks, setFavoriteLinks] = useState([])
-    const [folderId, setFolderId] = useState(0)
+    const [folderId, setFolderId] = useState()
     const [alertVisible, setAlertVisible] = useState(false)
     const [alertText, setAlertText] = useState('')
     const [visibleLoading, setVisibleLoading] = useState(false)
+    const [visibleModalNewLink, setVisibleModalNewLink] = useState(false)
+    const [popoverIsOpen, setPopoverIsOpen] = useState(false)
 
     useEffect(() => {
         getLianks()
         getDataFolder()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname])
 
-    async function getDataFolder(){
+    async function getDataFolder() {
         setVisibleLoading(true)
         const folderData = await getDataFolderLinks(params.nameFolder)
         setVisibleLoading(false)
@@ -70,7 +72,7 @@ function Links() {
         const data = await putFavoriteLink(name, url, folderId, id)
         await getLianks()
         setVisibleLoading(false)
-        
+
         setAlertText(data)
         setAlertVisible(true)
 
@@ -81,7 +83,7 @@ function Links() {
         const data = await deleteFavoriteLink(id)
         await getLianks()
         setVisibleLoading(false)
-       
+
         setAlertText(data)
         setAlertVisible(true)
     }
@@ -107,13 +109,22 @@ function Links() {
                     removeFavoriteLink={removeFavoriteLink}
                 />}
 
-            <Popover placement="top" isDismissable={false}>
+            {folderId && <ModalFavoriteLink
+                title="+ New favorite link"
+                action={saveFavoriteLinks}
+                folderId={folderId}
+                visible={visibleModalNewLink}
+                closeHandler={() => setVisibleModalNewLink(false)}
+            />}
+
+            <Popover placement="top" isOpen={popoverIsOpen} onClose={()=>setPopoverIsOpen(false)}>
                 <Popover.Trigger>
                     <Button
                         rounded
                         auto
                         color="primary"
                         shadow
+                        onPress={() => setPopoverIsOpen(true)}
                         icon={<BsFillPlusCircleFill style={{ fontSize: 50 }} />}
                         css={{
                             position: "fixed",
@@ -126,14 +137,14 @@ function Links() {
                     />
                 </Popover.Trigger>
                 <Popover.Content>
-                    <ModalFavoriteLink
-                        title="+ New favorite link"
-                        action={saveFavoriteLinks}
-                        folderId={folderId}
-                        showButtonRender={({click})=>(
-                            <Button light onPress={click} >+ New favorite link</Button>
-                        )}
-                    />
+                    <Button
+                        light
+                        onPress={() => {
+                            setPopoverIsOpen(false)
+                            setVisibleModalNewLink(true)
+                        }} >
+                        + New favorite link
+                    </Button>
                 </Popover.Content>
             </Popover>
 

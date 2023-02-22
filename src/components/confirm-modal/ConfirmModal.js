@@ -1,7 +1,7 @@
 import { Button, Modal, Text } from "@nextui-org/react";
 import { useState } from "react";
 
-function ConfirmModal({text, title, action, showButton}) {
+function ConfirmModal({ text, title, action, showButton }) {
 
     const [visible, setVisible] = useState(false);
     const handler = () => setVisible(true);
@@ -13,6 +13,7 @@ function ConfirmModal({text, title, action, showButton}) {
             {showButton({ click: handler })}
 
             <Modal
+                blur
                 closeButton
                 aria-labelledby="modal-title"
                 aria-describedby="modal-description"
@@ -33,8 +34,11 @@ function ConfirmModal({text, title, action, showButton}) {
                     <Button auto flat color="error" onPress={closeHandler}>
                         Close
                     </Button>
-                    <Button auto onPress={action}>
-                        Delete
+                    <Button auto onPress={() => {
+                        closeHandler()
+                        action()
+                    }}>
+                        Confirm
                     </Button>
                 </Modal.Footer>
             </Modal>

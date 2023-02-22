@@ -1,12 +1,13 @@
-import { Button, Input, Progress } from "@nextui-org/react";
-import { useEffect, useState } from "react";
-import { BsEnvelopeFill, BsFillPersonFill, BsFillPersonLinesFill, BsLockFill } from "react-icons/bs";
-import Alert from "../../../components/alert/Alert";
-import "../../../styles/StyleAuth.css";
-import { deleteUser, getUserData, putUser } from "../../../services/AuthService"
-import { removeToken } from "../../../services/TokenService";
-import { useNavigate } from "react-router-dom";
-import ConfirmModal from "../../../components/confirm-modal/ConfirmModal";
+import '../../../styles/StyleAuth.css';
+
+import { Button, Input, Progress } from '@nextui-org/react';
+import { useEffect, useState } from 'react';
+import { BsEnvelopeFill, BsFillPersonFill, BsFillPersonLinesFill, BsLockFill } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
+
+import Alert from '../../../components/alert/Alert';
+import ConfirmModal from '../../../components/confirm-modal/ConfirmModal';
+import { deleteUser, getUserData, patchUser } from '../../../services/AuthService';
 
 function UserData() {
 
@@ -20,11 +21,25 @@ function UserData() {
     const [visibleLoading, setVisibleLoading] = useState(false)
 
     useEffect(() => {
-        getUserData().then(userData => {
-            setEmail(userData.email)
-            setName(userData.name)
-        })
+        showUserData()
     }, [])
+
+    async function showUserData() {
+
+        setVisibleLoading(true)
+        const data = await getUserData()
+        setVisibleLoading(false)
+
+        if (typeof (data) === 'object') {
+            setEmail(data.email)
+            setName(data.name)
+            return
+        }
+
+        setAlertText(data)
+        setAlertVisible(true)
+
+    }
 
     async function updateUserData() {
 
@@ -35,7 +50,7 @@ function UserData() {
         }
 
         setVisibleLoading(true)
-        const response = await putUser({ email, name })
+        const response = await patchUser({ email, name })
         setVisibleLoading(false)
 
         setAlertText(response)
@@ -58,7 +73,7 @@ function UserData() {
         }
 
         setVisibleLoading(true)
-        const response = await putUser({ password })
+        const response = await patchUser({ password })
         setVisibleLoading(false)
 
         setAlertText(response)
@@ -70,11 +85,17 @@ function UserData() {
         <div>
 
             <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-            {visibleLoading && <Progress type="points" />}
+            {visibleLoading &&
+                <Progress
+                    indeterminated
+                    value={50}
+                    color="primary"
+                    status="primary"
+                />}
 
             <form className="formAuth">
                 <BsFillPersonFill className='userIconForm' />
-                <h3>User data</h3>
+                <h3>User data update</h3>
 
                 <Input
                     fullWidth
@@ -84,7 +105,7 @@ function UserData() {
                     bordered
                     color="primary"
                     placeholder="exemple@email.com"
-                    value={email}
+                    initialValue={email}
                     onChange={event => setEmail(event.target.value)}
                     contentLeft={<BsEnvelopeFill />}
                 />
@@ -97,7 +118,7 @@ function UserData() {
                     bordered
                     color="primary"
                     placeholder="Fulano"
-                    value={name}
+                    initialValue={name}
                     onChange={event => setName(event.target.value)}
                     contentLeft={<BsFillPersonLinesFill />}
                 />
@@ -134,7 +155,7 @@ function UserData() {
 
             </form>
 
-            <div className="formAuth">
+            <div >
 
                 <ConfirmModal
                     title="Delete account"
@@ -144,21 +165,10 @@ function UserData() {
                         navigate("/login")
                     }}
                     showButton={({ click }) => (
-                        <Button color='error' onPress={click} flat>Delete account</Button>
+                        <Button color='error' css={{margin: '30px auto'}} onPress={click} flat>Delete account</Button>
                     )}
                 />
-
-                <hr />
-                <Button
-                    color='error'
-                    onPress={() => {
-                        removeToken()
-                        navigate("/login")
-                    }}
-                    flat>
-                    Exit
-                </Button>
-                
+               
             </div>
 
         </div>);

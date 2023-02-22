@@ -1,9 +1,80 @@
-import { Button, Row } from "@nextui-org/react";
-import { BsFillTrashFill, BsPencilSquare } from "react-icons/bs";
+import { Button, Popover, Row } from "@nextui-org/react";
+import { useState } from "react";
+import { BsFillTrashFill, BsPencilSquare, BsThreeDotsVertical } from "react-icons/bs";
 import { MdFolder } from "react-icons/md";
 import { Link } from "react-router-dom";
-import ConfirmModal from "../confirm-modal/ConfirmModal";
+
 import ModalFolderLinks from "../modal-folder-links/ModalFolderLinks";
+
+function Folder({ folder, updateFolderLinks, removeFolderLinks }) {
+
+    const [visibleModalUpdate, setVisibleModalUpdate] = useState(false)
+    const [popoverIsOpen, setPopoverIsOpen] = useState(false)
+
+    return (
+        <Row
+            align="center"
+            justify="space-between"
+            css={{ borderBottom: "solid 1px #80808065", p: 10 }}
+        >
+
+            <Link to={`/${folder.name}`} >
+                <MdFolder style={{ fontSize: 25 }} />
+                {folder.name}
+            </Link>
+
+            <ModalFolderLinks
+                title="Update link"
+                name={folder.name}
+                action={(newFolderName) => {
+                    updateFolderLinks(newFolderName, folder.id)
+                }}
+                visible={visibleModalUpdate}
+                closeHandler={() => setVisibleModalUpdate(false)}
+            />
+
+            <Popover placement="top" isOpen={popoverIsOpen} onClose={()=>setPopoverIsOpen(false)}>
+                <Popover.Trigger>
+                    <Button
+                        auto
+                        light
+                        onPress={() => setPopoverIsOpen(true)}
+                        icon={<BsThreeDotsVertical />}
+                    />
+                </Popover.Trigger>
+                <Popover.Content>
+                    <div >
+
+                        <Button
+                            auto
+                            css={{ marginRight: 10 }}
+                            light
+                            onPress={() => {
+                                setPopoverIsOpen(false)
+                                setVisibleModalUpdate(true)
+                            }}>
+                            Update folder <BsPencilSquare style={{ marginLeft: 5 }} />
+                        </Button>
+
+                        <Button
+                            auto
+                            css={{ marginRight: 10 }}
+                            light
+                            onPress={() => {
+                                setPopoverIsOpen(false)
+                                removeFolderLinks(folder.id)
+                            }}
+                        >
+                            Delete folder <BsFillTrashFill style={{ marginLeft: 5 }} />
+                        </Button>
+
+                    </div>
+                </Popover.Content>
+            </Popover>
+
+        </Row>
+    )
+}
 
 function ListFolders({ folderLinks, updateFolderLinks, removeFolderLinks }) {
 
@@ -11,63 +82,14 @@ function ListFolders({ folderLinks, updateFolderLinks, removeFolderLinks }) {
         <div className="listLinksAndFolders">
             {/* List folder links */}
             {folderLinks.map(folder => {
+
                 return (
-                    <Row
-                        align="center"
+                    <Folder
                         key={folder.id}
-                        css={{ borderBottom: "solid 1px #80808065", p: 10 }}
-                    >
-
-                        <Link to={`/${folder.name}`} >
-                            <MdFolder style={{ fontSize: 25, margin: 10 }} />
-                            {folder.name}
-                        </Link>
-
-                        <Row justify="flex-end">
-
-                            <ModalFolderLinks
-                                title="Update link"
-                                name={folder.name}
-                                action={(newFolderName) => {
-                                    updateFolderLinks(newFolderName, folder.id)
-                                }}
-                                showButtonRender={({ click }) => (
-                                    <Button
-                                        auto
-                                        css={{ marginRight: 10 }}
-                                        color="warning"
-                                        flat
-                                        title="Update link"
-                                        shadow
-                                        onPress={click}>
-                                        <BsPencilSquare />
-                                    </Button>
-                                )}
-                            />
-
-                            <ConfirmModal
-                                title="Delete folder"
-                                text="If you delete this folder, all links in it will be permanently deleted. Do you really want to delete?"
-                                action={() => {
-                                    removeFolderLinks(folder.id)
-                                }}
-                                showButton={({ click }) => (
-                                    <Button
-                                        auto
-                                        css={{ marginRight: 10 }}
-                                        color="error"
-                                        flat
-                                        title="Delete folder"
-                                        shadow
-                                        onPress={click}
-                                    >
-                                        <BsFillTrashFill />
-                                    </Button>
-                                )}
-                            />
-
-                        </Row>
-                    </Row>
+                        folder={folder}
+                        updateFolderLinks={updateFolderLinks}
+                        removeFolderLinks={removeFolderLinks}
+                    />
                 )
             })
             }

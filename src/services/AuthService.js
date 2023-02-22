@@ -22,7 +22,6 @@ export async function userResgister(email, password, name) {
         await api.post('/user/register', { email, password, name })
 
         const status = await login(email, password)
-        console.log(status);
         return status;
 
     } catch (error) {
@@ -47,26 +46,7 @@ export async function getUserData() {
 
     } catch (error) {
         console.log(error);
-        return error.response.data
-    }
-}
-
-export async function putUser(user) {
-    try {
-
-        const response = await api.patch('/user/update', user,
-            {
-                headers: {
-                    'Authorization': getToken(),
-                }
-            }
-        )
-
-        return response.data
-
-    } catch (error) {
-        console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
@@ -83,7 +63,7 @@ export async function deleteUser() {
         return response.status
     } catch (error) {
         console.log(error);
-        return error.response.data
+        return error.response ? error.response.data : "Error"
     }
 }
 
@@ -95,12 +75,8 @@ export async function sendingEmailFogotPassword(emailTo) {
         return { message: response.data, sent: true }
 
     } catch (error) {
-
-        if (error.response) {
-            return { message: error.response.data, sent: false }
-        }
-
-        return { message: "Erro!", sent: false }
+        console.log(error);
+        return error.response ? error.response.data : "Error"
 
     }
 }
@@ -113,11 +89,105 @@ export async function changingForgottenPassword(changeForgottenPassword) {
         return response.data
 
     } catch (error) {
-
-        if (error.response) {
-            return error.response.data
-        }
-
-        return "Erro!"
+        console.log(error);
+        return error.response ? error.response.data : "Error"
     }
 }
+
+export async function patchUser(user) {
+    try {
+
+        const response = await api.patch('/user/update', user,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            }
+        )
+
+        return response.data
+
+    } catch (error) {
+        console.log(error);
+        return error.response ? error.response.data : "Error"
+    }
+}
+
+//only user with MASTER and ADMIN permission can use other user
+export async function getAllUsers(page = 0) {
+    try {
+       
+        const response = await api.get(`/user/list-all-users?page=${page}&size=30`,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            })
+
+        return response.data;
+
+    } catch (error) {
+        console.log(error);
+        return error.response ? error.response.data : "Error"
+    }
+}
+
+//only user with MASTER and ADMIN permission can use other user
+export async function findUser(page = 0, name='') {
+    try {
+
+        const response = await api.get(`/user/list-all-users?page=${page}&size=30&name=${name}`,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            })
+
+        return response.data;
+
+    } catch (error) {
+        console.log(error);
+        return error.response ? error.response.data : "Error"
+    }
+}
+
+//only user with MASTER and ADMIN permission can use other user
+export async function patchOneUser(email, user) {
+    try {
+
+        const response = await api.patch(`/user/update-one-user/${email}`, user,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            }
+        )
+
+        return response.data
+
+    } catch (error) {
+        console.log(error);
+        return error.response ? error.response.data : "Error"
+    }
+}
+
+//only user with MASTER and ADMIN permission can use other user
+export async function deleteOneUser(email) {
+    try {
+
+        const response = await api.delete(`/user/delete-one-user/${email}`,
+            {
+                headers: {
+                    'Authorization': getToken(),
+                }
+            }
+        )
+
+        return response.data
+
+    } catch (error) {
+        console.log(error);
+        return error.response ? error.response.data : "Error"
+    }
+}
+

@@ -11,6 +11,7 @@ import Links from "./pages/FavoriteLinks/links/Links";
 import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword";
 import ChangeForgotPassword from "./pages/Auth/forgot-password/ChangeForgotPassword";
 import Container from "./pages/Container/Container";
+import ListUsers from "./pages/Auth/list-users/ListUsers";
 
 const dark = createTheme({
   type: "dark", // it could be "light" or "dark"
@@ -113,6 +114,7 @@ function App() {
             <Route path="/user-data" element={<UserData />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/change-forgot-password" element={<ChangeForgotPassword />} />
+            <Route path="/list-users" element={<ListUsers />} />
 
           </Routes>
 

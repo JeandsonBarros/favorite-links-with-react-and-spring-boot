@@ -1,9 +1,8 @@
-.listLinksAndFolders{
-    margin: 10px; 
-    padding: 3px;  
+.listLinksAndFolders {
+    margin: 0 10px 0 10px;
 }
 
-.listLinksAndFolders a{
+.listLinksAndFolders a {
     display: flex;
     align-items: center;
 }

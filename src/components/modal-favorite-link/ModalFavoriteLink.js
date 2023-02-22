@@ -3,19 +3,17 @@ import { useEffect, useState } from "react";
 import { getAllFolderLinks } from "../../services/LinksFolderService";
 import Alert from "../alert/Alert";
 
-function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, folderId }) {
+function ModalFavoriteLink({ favoriteLinkProp, closeHandler, visible, action, title, folderId }) {
 
   const [favoriteLink, setFavoriteLink] = useState(favoriteLinkProp || { name: '', url: '', folderId });
   const [folderLinks, setFolderLinks] = useState([])
-  const [visible, setVisible] = useState(false);
   const [alertText, setAlertText] = useState('')
   const [visibleLoading, setVisibleLoading] = useState(false)
   const [alertVisible, setAlertVisible] = useState(false)
-  const handler = () => setVisible(true);
 
   useEffect(() => {
     getTotalFolderLinks()
-  }, [])
+  }, [visible])
 
 
   async function getTotalFolderLinks() {
@@ -34,10 +32,6 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
 
   }
 
-  const closeHandler = () => {
-    setVisible(false);
-  };
-
   function setValues(value, key) {
     let tempValues = { ...favoriteLink }
     tempValues[key] = value
@@ -45,14 +39,6 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
   }
 
   return (
-    <div>
-
-      {
-        showButtonRender({
-          click: handler
-        })
-      }
-
       <Modal
         closeButton
         aria-labelledby="modal-title"
@@ -69,7 +55,7 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
 
           <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
           {visibleLoading && <Loading type="points" />}
-         
+
           <Input
             aria-label="nameLink"
             clearable
@@ -78,7 +64,7 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
             color="primary"
             size="lg"
             placeholder="Name"
-            value={favoriteLink.name}
+            initialValue={favoriteLink.name}
             onChange={event => setValues(event.target.value, "name")}
           />
 
@@ -91,13 +77,13 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
             size="lg"
             type="url"
             placeholder="URL"
-            value={favoriteLink.url}
+            initialValue={favoriteLink.url}
             onChange={event => setValues(event.target.value, "url")}
           />
 
           <hr />
 
-         {!folderId && <div>
+          {!folderId && <div>
 
             <h5>Update folder</h5>
             <small>If you don't select a folder, the link will be saved in the root folders</small>
@@ -122,7 +108,6 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
             Close
           </Button>
           <Button auto onPress={() => {
-            console.log(favoriteLink);
             closeHandler()
             action(favoriteLink.name, favoriteLink.url, favoriteLink.folderId)
           }}>
@@ -130,7 +115,6 @@ function ModalFavoriteLink({ favoriteLinkProp, action, title, showButtonRender, 
           </Button>
         </Modal.Footer>
       </Modal>
-    </div >
   );
 }
 
