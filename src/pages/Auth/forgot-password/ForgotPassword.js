@@ -3,22 +3,20 @@ import { useState } from "react";
 import { BsEnvelopeFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Alert from "../../../components/alert/Alert";
-import { sendCodeToResetPassword } from "../../../services/ForgotPasswordService";
+import { sendCodeToResetPassword } from "../../../services/AuthService";
 import "../../../styles/StyleAuth.css";
 
 function ForgotPassword() {
 
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
 
     async function sendEmail() {
 
         if (!email) {
-            setAlertText("Enter an email!")
-            alertVisible(true)
+            setAlert({ visible: true, text: "Enter an email!" })
             return
         }
 
@@ -27,21 +25,19 @@ function ForgotPassword() {
         setVisibleLoading(false)
 
         if (response === 201) {
-            setAlertText("Email successfully sent")
-            setAlertVisible(true)
+            setAlert({ visible: true, text: "Email successfully sent" })
             setTimeout(()=>navigate("/change-forgot-password"), 2000)
             return
         }
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
     }
 
     return (
         <div>
             <form className='formAuth'>
 
-                <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+            <Alert onClosed={() => setAlert({ visible: false, text: '' })} visible={alert.visible} text={alert.text} />
                 {visibleLoading && <Progress
                     indeterminated
                     value={50}

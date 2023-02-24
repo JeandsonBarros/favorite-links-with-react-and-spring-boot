@@ -13,36 +13,25 @@ function Register() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
 
     async function registerUser(event) {
         event.preventDefault()
 
-        if (!email || !password || !name || !confirmPassword) {
-            setAlertText("Don't leave empty fields")
-            setAlertVisible(true)
-            return
-        }
+        if (!email || !password || !name || !confirmPassword)
+            return setAlert({ visible: true, text: "Don't leave empty fields" })
 
-        if (password !== confirmPassword) {
-            setAlertText("Passwords do not match")
-            setAlertVisible(true)
-            return
-        }
+        if (password !== confirmPassword)
+            return setAlert({ visible: true, text: "Passwords do not match" })
 
         setVisibleLoading(true)
         const response = await userResgister(email, password, name)
         setVisibleLoading(false)
 
-        if (response === "authenticated") {
-            setAlertVisible(false)
-            return navigate('/')
-        }
+        if (response === "authenticated") return navigate('/')
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
 
     }
 
@@ -54,7 +43,12 @@ function Register() {
                 <BsFillPersonFill className='userIconForm' />
                 <h1>Register</h1>
 
-                <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+                <Alert
+                    onClosed={() => setAlert({ visible: false, text: '' })}
+                    visible={alert.visible}
+                    text={alert.text}
+                />
+                
                 {visibleLoading && <Loading type="points" />}
 
                 <Input

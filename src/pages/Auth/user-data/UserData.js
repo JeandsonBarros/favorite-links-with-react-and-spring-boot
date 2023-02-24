@@ -16,8 +16,7 @@ function UserData() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
 
     useEffect(() => {
@@ -36,55 +35,48 @@ function UserData() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
     async function updateUserData() {
 
-        if (!email || !name) {
-            setAlertText("Don't leave empty fields")
-            setAlertVisible(true)
-            return
-        }
+        if (!email || !name)
+            return setAlert({ visible: true, text: "Don't leave empty fields" })
 
         setVisibleLoading(true)
         const response = await patchUser({ email, name })
         setVisibleLoading(false)
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
 
     }
 
     async function updateUserPassword() {
 
-        if (!password || !confirmPassword) {
-            setAlertText("Don't leave empty fields")
-            setAlertVisible(true)
-            return
-        }
+        if (!password || !confirmPassword)
+            return setAlert({ visible: true, text: "Don't leave empty fields" })
 
-        if (password !== confirmPassword) {
-            setAlertText("Passwords do not match")
-            setAlertVisible(true)
-            return
-        }
+        if (password !== confirmPassword)
+            return setAlert({ visible: true, text: "Passwords do not match" })
 
         setVisibleLoading(true)
         const response = await patchUser({ password })
         setVisibleLoading(false)
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
 
     }
 
     return (
         <div>
 
-            <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+            <Alert
+                onClosed={() => setAlert({ visible: false, text: '' })}
+                visible={alert.visible}
+                text={alert.text}
+            />
+
             {visibleLoading &&
                 <Progress
                     indeterminated
@@ -165,10 +157,10 @@ function UserData() {
                         navigate("/login")
                     }}
                     showButton={({ click }) => (
-                        <Button color='error' css={{margin: '30px auto'}} onPress={click} flat>Delete account</Button>
+                        <Button color='error' css={{ margin: '30px auto' }} onPress={click} flat>Delete account</Button>
                     )}
                 />
-               
+
             </div>
 
         </div>);

@@ -7,9 +7,9 @@ function ModalFavoriteLink({ favoriteLinkProp, closeHandler, visible, action, ti
 
   const [favoriteLink, setFavoriteLink] = useState(favoriteLinkProp || { name: '', url: '', folderId });
   const [folderLinks, setFolderLinks] = useState([])
-  const [alertText, setAlertText] = useState('')
+  const [alert, setAlert] = useState({ visible: false, text: '' })
   const [visibleLoading, setVisibleLoading] = useState(false)
-  const [alertVisible, setAlertVisible] = useState(false)
+
 
   useEffect(() => {
     getTotalFolderLinks()
@@ -27,8 +27,7 @@ function ModalFavoriteLink({ favoriteLinkProp, closeHandler, visible, action, ti
       return
     }
 
-    setAlertText(data)
-    setAlertVisible(true)
+    setAlert({ visible: true, text: data })
 
   }
 
@@ -39,82 +38,91 @@ function ModalFavoriteLink({ favoriteLinkProp, closeHandler, visible, action, ti
   }
 
   return (
-      <Modal
-        closeButton
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-        open={visible}
-        onClose={closeHandler}
-      >
-        <Modal.Header>
-          <Text id="modal-title" size={18}>
-            {title}
-          </Text>
-        </Modal.Header>
-        <Modal.Body>
+    <Modal
+      closeButton
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+      open={visible}
+      onClose={closeHandler}
+    >
+      <Modal.Header>
+        <Text id="modal-title" size={18}>
+          {title}
+        </Text>
+      </Modal.Header>
+      <Modal.Body>
 
-          <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-          {visibleLoading && <Loading type="points" />}
+        <Alert
+          onClosed={() => setAlert({ visible: false, text: '' })}
+          visible={alert.visible}
+          text={alert.text}
+        />
+        
+        {visibleLoading && <Loading type="points" />}
 
-          <Input
-            aria-label="nameLink"
-            clearable
-            bordered
-            fullWidth
-            color="primary"
-            size="lg"
-            placeholder="Name"
-            initialValue={favoriteLink.name}
-            onChange={event => setValues(event.target.value, "name")}
-          />
+        <Input
+          aria-label="nameLink"
+          clearable
+          bordered
+          fullWidth
+          color="primary"
+          size="lg"
+          placeholder="Name"
+          initialValue={favoriteLink.name}
+          onChange={event => setValues(event.target.value, "name")}
+        />
 
-          <Input
-            aria-label="url"
-            clearable
-            bordered
-            fullWidth
-            color="primary"
-            size="lg"
-            type="url"
-            placeholder="URL"
-            initialValue={favoriteLink.url}
-            onChange={event => setValues(event.target.value, "url")}
-          />
+        <Input
+          aria-label="url"
+          clearable
+          bordered
+          fullWidth
+          color="primary"
+          size="lg"
+          type="url"
+          placeholder="URL"
+          initialValue={favoriteLink.url}
+          onChange={event => setValues(event.target.value, "url")}
+        />
 
-          <hr />
+        <hr />
 
-          {!folderId && <div>
+        {!folderId && <div>
 
-            <h5>Update folder</h5>
-            <small>If you don't select a folder, the link will be saved in the root folders</small>
+          <h5>Update folder</h5>
+          <small>If you don't select a folder, the link will be saved in the root folders</small>
 
-            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-              {folderLinks.map(folder => (
-                <Button
-                  auto
-                  light={favoriteLink.folderId !== folder.id}
-                  key={folder.id}
-                  onPress={() => setValues(folder.id, "folderId")}>
-                  {folder.name === "root" ? "/" : folder.name}
-                </Button>
-              ))}
-            </div>
+          <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+            {folderLinks.map(folder => (
+              <Button
+                auto
+                light={favoriteLink.folderId !== folder.id}
+                key={folder.id}
+                onPress={() => setValues(folder.id, "folderId")}>
+                {folder.name === "root" ? "/" : folder.name}
+              </Button>
+            ))}
+          </div>
 
-          </div>}
+        </div>}
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button auto flat color="error" onPress={closeHandler}>
-            Close
-          </Button>
-          <Button auto onPress={() => {
-            closeHandler()
-            action(favoriteLink.name, favoriteLink.url, favoriteLink.folderId)
-          }}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button auto flat color="error" onPress={closeHandler}>
+          Close
+        </Button>
+        <Button auto onPress={() => {
+
+          if(!favoriteLink.name || !favoriteLink.url)
+            return setAlert({ visible: true, text: "Don't leave empty fields" })
+
+          closeHandler()
+          action(favoriteLink.name, favoriteLink.url, favoriteLink.folderId)
+        }}>
+          Save
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }
 

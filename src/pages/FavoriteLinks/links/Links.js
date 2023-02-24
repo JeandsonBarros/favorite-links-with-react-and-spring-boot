@@ -1,13 +1,14 @@
-import { Button, Popover, Progress } from "@nextui-org/react";
-import { useEffect, useState } from "react";
-import { BsFillPlusCircleFill } from "react-icons/bs";
-import { useLocation, useParams } from "react-router-dom";
-import Alert from "../../../components/alert/Alert";
-import Directory from "../../../components/directory/Directory";
-import ListLinks from "../../../components/list-links/ListLinks";
-import ModalFavoriteLink from "../../../components/modal-favorite-link/ModalFavoriteLink";
-import { deleteFavoriteLink, postFavoriteLink, putFavoriteLink } from "../../../services/FavoriteLinksService";
-import { getDataFolderLinks, getFolderLinks } from "../../../services/LinksFolderService";
+import { Button, Popover, Progress } from '@nextui-org/react';
+import { useEffect, useState } from 'react';
+import { BsFillPlusCircleFill } from 'react-icons/bs';
+import { useLocation, useParams } from 'react-router-dom';
+
+import Alert from '../../../components/alert/Alert';
+import Directory from '../../../components/directory/Directory';
+import ListLinks from '../../../components/list-links/ListLinks';
+import ModalFavoriteLink from '../../../components/modal-favorite-link/ModalFavoriteLink';
+import { deleteFavoriteLink, postFavoriteLink, putFavoriteLink } from '../../../services/FavoriteLinksService';
+import { getDataFolderLinks, getFolderLinks } from '../../../services/LinksFolderService';
 
 function Links() {
 
@@ -15,8 +16,7 @@ function Links() {
     const params = useParams();
     const [favoriteLinks, setFavoriteLinks] = useState([])
     const [folderId, setFolderId] = useState()
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
     const [visibleModalNewLink, setVisibleModalNewLink] = useState(false)
     const [popoverIsOpen, setPopoverIsOpen] = useState(false)
@@ -37,8 +37,7 @@ function Links() {
             return
         }
 
-        setAlertText(folderData)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: folderData })
     }
 
     async function getLianks() {
@@ -51,8 +50,7 @@ function Links() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
@@ -63,8 +61,7 @@ function Links() {
         await getLianks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     async function updateFavoriteLink(name, url, folderId, id) {
@@ -73,9 +70,7 @@ function Links() {
         await getLianks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
-
+        setAlert({ visible: true, text: data })
     }
 
     async function removeFavoriteLink(id) {
@@ -84,15 +79,14 @@ function Links() {
         await getLianks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     return (
         <>
             <Directory pathname={params.nameFolder} />
 
-            <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+            <Alert onClosed={() => setAlert({ visible: false, text: '' })} visible={alert.visible} text={alert.text} />
             {visibleLoading &&
                 <Progress
                     indeterminated

@@ -1,10 +1,10 @@
 import { Button, Input, Progress, Row } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsEnvelopeFill, BsLockFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Alert from "../../../components/alert/Alert";
 import { TiSortNumerically } from "react-icons/ti";
-import { changeForgottenPassword } from "../../../services/ForgotPasswordService";
+import { changeForgottenPassword, login } from "../../../services/AuthService";
 
 function ChangeForgotPassword() {
 
@@ -13,21 +13,19 @@ function ChangeForgotPassword() {
     const [newPassword, setNewPassword] = useState()
     const [confirmNewPassword, setConfirmNewPassword] = useState()
     const [recoveryCode, setRecoveryCode] = useState()
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
+    const [contProgress, setContProgress] = useState(0)
 
     async function changePassword() {
 
         if (!email || !newPassword || !recoveryCode || !confirmNewPassword) {
-            setAlertText("Don't leave empty fields")
-            alertVisible(true)
+            setAlert({ visible: true, text: "Don't leave empty fields" })
             return
         }
 
         if (newPassword !== confirmNewPassword) {
-            setAlertText("Passwords do not match")
-            setAlertVisible(true)
+            setAlert({ visible: true, text: "Passwords do not match" })
             return
         }
 
@@ -35,21 +33,49 @@ function ChangeForgotPassword() {
         const response = await changeForgottenPassword(email, newPassword, recoveryCode)
         setVisibleLoading(false)
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
+
+        if (response === 'updated password') {
+            const loginResponse = await login(email, newPassword)
+            if (loginResponse === 'authenticated') {
+                let cont = 0
+                setInterval(() => {
+                    cont += 20
+                    setContProgress(cont)
+                    if (cont === 100) navigate('/')
+                }, 1000)
+            }
+        }
+
+
     }
 
     return (
         <div>
             <form className='formAuth'>
 
-                <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-                {visibleLoading && <Progress
-                    indeterminated
-                    value={50}
-                    color="primary"
-                    status="primary"
-                />}
+                <Alert onClosed={() => setAlert({ visible: false, text: '' })} visible={alert.visible} text={alert.text} />
+
+                {
+                    contProgress >= 20 &&
+                    <>
+                        <h3>Logging in</h3>
+                        <Progress
+                            value={contProgress}
+                            color="primary"
+                            status="primary"
+                        />
+                    </>
+                }
+                {
+                    visibleLoading &&
+                    <Progress
+                        indeterminated
+                        value={30}
+                        color="primary"
+                        status="primary"
+                    />
+                }
 
                 <h2>Change forgotten password</h2>
 
@@ -75,7 +101,7 @@ function ChangeForgotPassword() {
                     contentLeft={<TiSortNumerically />}
                 />
 
-                <Input.Password        
+                <Input.Password
                     fullWidth
                     label="Password"
                     placeholder="user12345"
@@ -85,7 +111,7 @@ function ChangeForgotPassword() {
                     contentLeft={<BsLockFill />}
                 />
 
-                <Input.Password     
+                <Input.Password
                     fullWidth
                     label="Password"
                     placeholder="user12345"

@@ -27,8 +27,7 @@ function LinksAndFolders() {
     const params = useParams()
     const [favoriteLinks, setFavoriteLinks] = useState([])
     const [folderLinks, setFolderLinks] = useState([])
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
     const [folderRootId, setFolderRootId] = useState()
     const [visibleModalNewFolder, setVisibleModalNewFolder] = useState(false)
@@ -62,8 +61,7 @@ function LinksAndFolders() {
             return
         }
 
-        setAlertText(folderData)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: folderData })
     }
 
     async function getListFolderLinks() {
@@ -81,8 +79,7 @@ function LinksAndFolders() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
@@ -95,8 +92,7 @@ function LinksAndFolders() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     async function saveFavoriteLinks(name, url, folderId) {
@@ -107,8 +103,7 @@ function LinksAndFolders() {
         await getListFolderLinks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     async function saveFolderLinks(folderName) {
@@ -119,8 +114,7 @@ function LinksAndFolders() {
         await getListFolderLinks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
@@ -132,8 +126,7 @@ function LinksAndFolders() {
         await getListFolderLinks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     async function removeFolderLinks(id) {
@@ -143,8 +136,7 @@ function LinksAndFolders() {
         await getListFolderLinks()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     async function updateFavoriteLink(name, url, folderId, id) {
@@ -154,8 +146,7 @@ function LinksAndFolders() {
         await getFavoriteLinksInRoot()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
@@ -165,8 +156,7 @@ function LinksAndFolders() {
         await getFavoriteLinksInRoot()
         setVisibleLoading(false)
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
     }
 
     return (
@@ -174,7 +164,7 @@ function LinksAndFolders() {
 
             <Directory pathname="/" />
 
-            <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+            <Alert onClosed={() => setAlert({ visible: false, text: '' })} visible={alert.visible} text={alert.text} />
             {visibleLoading &&
                 <Progress
                     indeterminated
@@ -216,7 +206,7 @@ function LinksAndFolders() {
                 closeHandler={() => setVisibleModalNewFolder(false)}
             />
 
-            <Popover placement="top" isOpen={popoverIsOpen} onClose={()=>setPopoverIsOpen(false)}> 
+            <Popover placement="top" isOpen={popoverIsOpen} onClose={() => setPopoverIsOpen(false)}>
 
                 <Popover.Trigger>
                     <Button

@@ -12,18 +12,14 @@ function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
 
     async function loginUser(event) {
         event.preventDefault()
 
-        if (!email || !password) {
-            setAlertText("Don't leave empty fields")
-            setAlertVisible(true)
-            return
-        }
+        if (!email || !password)
+            return setAlert({ visible: true, text: "Don't leave empty fields" })
 
         setVisibleLoading(true)
         const response = await login(email, password)
@@ -32,8 +28,7 @@ function Login() {
         if (response === "authenticated")
             return navigate('/')
 
-        setAlertText(response)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: response })
 
     }
 
@@ -45,7 +40,12 @@ function Login() {
                 <BsFillPersonFill className='userIconForm' />
                 <h1>Login</h1>
 
-                <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
+                <Alert
+                    onClosed={() => setAlert({ visible: false, text: '' })}
+                    visible={alert.visible}
+                    text={alert.text}
+                />
+
                 {visibleLoading && <Loading type="points" />}
 
                 <Input
@@ -74,7 +74,7 @@ function Login() {
                     <Link to="/forgot-password">Forgot password?</Link>
                 </div>
 
-                <Button css={{mt: 20}} shadow type='submit'>Login</Button>
+                <Button css={{ mt: 20 }} shadow type='submit'>Login</Button>
                 <Link to="/register">Register</Link>
 
             </form>

@@ -12,14 +12,9 @@ const ListContext = createContext(null);
 export default function ListUsers() {
 
     const navigate = useNavigate()
-
     const [search, setSearch] = useState('')
-
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alertText, setAlertText] = useState('')
-
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
-
     const [page, setPage] = useState(0)
     const [totalUsers, setTotalUsers] = useState(0)
     const [authenticatedUser, setAuthenticatedUser] = useState()
@@ -28,6 +23,7 @@ export default function ListUsers() {
     useEffect(() => {
         listUsers()
         showUserData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function showUserData() {
@@ -68,8 +64,7 @@ export default function ListUsers() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
 
     }
 
@@ -85,8 +80,7 @@ export default function ListUsers() {
             return
         }
 
-        setAlertText(data)
-        setAlertVisible(true)
+        setAlert({ visible: true, text: data })
         listUsers()
 
     }
@@ -126,14 +120,21 @@ export default function ListUsers() {
     return (
         <div>
 
-            <Alert setVisible={setAlertVisible} visible={alertVisible} text={alertText} />
-            {visibleLoading &&
+            <Alert
+                onClosed={() => setAlert({ visible: false, text: '' })}
+                visible={alert.visible}
+                text={alert.text}
+            />
+
+            {
+                visibleLoading &&
                 <Progress
                     indeterminated
                     value={50}
                     color="primary"
                     status="primary"
-                />}
+                />
+            }
 
             <Text h2 css={{ m: 10 }}>User list</Text>
 
@@ -198,7 +199,7 @@ export default function ListUsers() {
 function ModalUpdateUser({ visibleModal, setVisibleModal, user }) {
 
     const [userUpdate, setUserUpdate] = useState({ ...user, roles: user.roles.map(role => role.role), confirmPassword: '' })
-    const [alertText, setAlertText] = useState('')
+    const [alert, setAlert] = useState({ visible: false, text: '' })
     const [visibleLoading, setVisibleLoading] = useState(false)
     const listContext = useContext(ListContext);
 
@@ -215,8 +216,7 @@ function ModalUpdateUser({ visibleModal, setVisibleModal, user }) {
             aria-describedby="modal-description"
             open={visibleModal}
             onClose={() => {
-                setVisibleModal(false)
-                setAlertText('')
+                setAlert({ visible: false, text: '' })
             }}
         >
             <Modal.Body>
@@ -229,7 +229,7 @@ function ModalUpdateUser({ visibleModal, setVisibleModal, user }) {
                         status="primary"
                     />}
 
-                <Alert setVisible={() => setAlertText('')} visible={alertText.length > 0} text={alertText} />
+                <Alert onClosed={() => setAlert({ visible: false, text: '' })} visible={alert.visible} text={alert.text} />
 
                 <h3>Update data</h3>
 
@@ -280,7 +280,7 @@ function ModalUpdateUser({ visibleModal, setVisibleModal, user }) {
                         setVisibleLoading(true)
                         const response = await listContext.updateUserData(userUpdate)
                         setVisibleLoading(false)
-                        setAlertText(response)
+                        setAlert({ visible: true, text: response })
                     }}
                 >
                     Update
@@ -317,7 +317,7 @@ function ModalUpdateUser({ visibleModal, setVisibleModal, user }) {
                         setVisibleLoading(true)
                         const response = await listContext.updateUserPassword(userUpdate)
                         setVisibleLoading(false)
-                        setAlertText(response)
+                        setAlert({ visible: true, text: response })
                     }}
                 >
                     Update

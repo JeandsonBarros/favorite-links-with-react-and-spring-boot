@@ -1,16 +1,18 @@
 import { Button, Card, Row, Text } from "@nextui-org/react";
 import { useEffect } from "react";
 
-function Alert({ visible, setVisible, text }) {
+function Alert({ visible, onClosed, text }) {
 
     useEffect(() => {
 
-        if (visible)
-            setTimeout(() => {
-                setVisible(false)
-            }, 4000)
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        const time = setTimeout(() => {
+            onClosed()
+        }, 4000)
+
+        return () => clearTimeout(time)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible])
 
     return (
@@ -26,14 +28,14 @@ function Alert({ visible, setVisible, text }) {
                 <Card.Body>
                     <Row justify='space-between'>
 
-                        <Text size={18} >{text}</Text>
+                        <Text size={18} > {text} </Text>
 
-                        {setVisible && <Button
+                        {onClosed && <Button
                             color='error'
                             shadow
                             flat
                             auto
-                            onPress={() => setVisible(false)}
+                            onPress={onClosed}
                         >
                             X
                         </Button>}

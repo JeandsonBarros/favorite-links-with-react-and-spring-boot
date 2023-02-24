@@ -67,33 +67,6 @@ export async function deleteUser() {
     }
 }
 
-export async function sendingEmailFogotPassword(emailTo) {
-    try {
-
-        const response = await api.post("/user/forgot-password/sending-email-code", { emailTo })
-
-        return { message: response.data, sent: true }
-
-    } catch (error) {
-        console.log(error);
-        return error.response ? error.response.data : "Error"
-
-    }
-}
-
-export async function changingForgottenPassword(changeForgottenPassword) {
-    try {
-
-        const response = await api.post("/user/forgot-password/change-password", changeForgottenPassword)
-
-        return response.data
-
-    } catch (error) {
-        console.log(error);
-        return error.response ? error.response.data : "Error"
-    }
-}
-
 export async function patchUser(user) {
     try {
 
@@ -112,6 +85,31 @@ export async function patchUser(user) {
         return error.response ? error.response.data : "Error"
     }
 }
+
+export async function sendCodeToResetPassword(email) {
+    try {
+
+        const response = await api.post("/email-for-forgot-password/send-email", { email })
+        return response.status
+
+    } catch (error) {
+        console.log(error);
+        return error.response.data
+    }
+} 
+
+export async function changeForgottenPassword(email, newPassword, recoveryCode) {
+    try {
+
+        const response = await api.post("/email-for-forgot-password/change-forgotten-password", { email, newPassword, recoveryCode })
+
+        return response.data
+
+    } catch (error) {
+        console.log(error);
+        return error.response.data
+    }
+} 
 
 //only user with MASTER and ADMIN permission can use other user
 export async function getAllUsers(page = 0) {
