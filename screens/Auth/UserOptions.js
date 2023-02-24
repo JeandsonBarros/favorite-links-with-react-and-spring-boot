@@ -11,7 +11,7 @@ import Styles from '../../styles/Styles';
 export default function UserOptions({ navigation }) {
 
     const [user, setUser] = useState()
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
     const [visibleModal, setVisibleModal] = useState(false)
     const [visibleActivityIndicator, setVisibleActivityIndicator] = useState(false)
 
@@ -44,7 +44,7 @@ export default function UserOptions({ navigation }) {
             return navigation.navigate("Login")
         }
 
-        setAlert({ visible: true, text: data })
+        setAlert({ text: response, visible: true, status: response === 'Error' ? 'error' : 'success' })
 
     }
 
@@ -55,7 +55,7 @@ export default function UserOptions({ navigation }) {
                 <TouchableOpacity
                     onPress={() => navigation.navigate("ListUsers")}
                     style={Styles.listStyle} >
-                    <Icon name="users" size={20} />
+                    <Icon  color="rgb(30,30,30)" name="users" size={20} />
                     <Text style={Styles.textItemList}>Users</Text>
                 </TouchableOpacity >
             )
@@ -70,7 +70,8 @@ export default function UserOptions({ navigation }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: '', status: 'info' })}
             />
 
             {
@@ -86,21 +87,17 @@ export default function UserOptions({ navigation }) {
                 </View>
             }
 
-            <TouchableOpacity
-                onPress={() => navigation.navigate("UserData")}
-                style={Styles.listStyle}>
-                <Icon name="user" size={25} />
-                <Text style={Styles.textItemList}>
-                    Account data
-                </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                onPress={() => navigation.navigate("AccountSecurity")}
-                style={Styles.listStyle}>
-                <Icon name="shield" size={25} />
-                <Text style={Styles.textItemList}>Account security</Text>
-            </TouchableOpacity>
+            {
+                user &&
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("UpdateAuthenticated", { user })}
+                    style={Styles.listStyle}>
+                    <Icon  color="rgb(30,30,30)" name="user" size={25} />
+                    <Text style={Styles.textItemList}>
+                        Account config
+                    </Text>
+                </TouchableOpacity>
+            }
 
             <ConfirmModal
                 visible={visibleModal}
@@ -113,7 +110,7 @@ export default function UserOptions({ navigation }) {
             <TouchableOpacity
                 onPress={() => setVisibleModal(true)}
                 style={Styles.listStyle}>
-                <Icon name="trash" size={25} />
+                <Icon name="trash" size={25} color="rgb(30,30,30)" />
                 <Text style={Styles.textItemList}>Remove account</Text>
             </TouchableOpacity>
 

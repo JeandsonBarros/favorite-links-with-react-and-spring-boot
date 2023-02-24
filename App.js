@@ -3,12 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import AccountSecurity from './screens/Auth/AccountSecurity';
 import ForgotPassword from './screens/Auth/ForgotPassword';
 import ListUsers from './screens/Auth/ListUsers';
 import Login from './screens/Auth/Login';
 import Register from './screens/Auth/Register';
-import UserData from './screens/Auth/UserData';
+import UpdateAuthenticated from './screens/Auth/UpdateAuthenticated';
+import UpdateAUser from './screens/Auth/UpdateAUser';
 import UserOptions from './screens/Auth/UserOptions';
 import FolderLinks from './screens/FavoriteLinks/FolderLinks';
 import LinksAndFolders from './screens/FavoriteLinks/LinksAndFolders';
@@ -22,12 +22,19 @@ export default function App() {
 
     <NavigationContainer>
 
-      <Stack.Navigator initialRouteName='Logo'>
+      <Stack.Navigator initialRouteName='Logo'
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#3694FF',
+          },
+          headerTintColor: '#fff',
+        }}>
 
         <Stack.Screen
           name="Logo"
           component={Logo}
           options={{ headerShown: false }}
+
         />
 
         <Stack.Screen
@@ -46,21 +53,13 @@ export default function App() {
           component={LinksAndFolders}
           options={({ navigation, route }) => ({
             headerLeft: () => <></>,
-            headerTitle: "Links and Folders",
+            headerTitle: "Root folder",
             headerRight: () => (
               <TouchableOpacity onPress={() => navigation.navigate("UserOptions")}>
-                <Icon name="person-circle-outline" size={40} color="#3694FF" />
+                <Icon name="person-circle-outline" size={40} color="#fff" />
               </TouchableOpacity>
             ),
           })}
-        />
-
-        <Stack.Screen
-          name="UserData"
-          component={UserData}
-          options={{
-            headerTitle: "User data",
-          }}
         />
 
         <Stack.Screen
@@ -72,18 +71,26 @@ export default function App() {
         />
 
         <Stack.Screen
-          name="AccountSecurity"
-          component={AccountSecurity}
-          options={{
-            headerTitle: "Account security",
-          }}
-        />
-
-        <Stack.Screen
           name="ListUsers"
           component={ListUsers}
           options={{
             headerTitle: "List users",
+          }}
+        />
+
+        <Stack.Screen
+          name="UpdateAUser"
+          component={UpdateAUser}
+          options={{
+            headerTitle: "Update a user",
+          }}
+        />
+
+        <Stack.Screen
+          name="UpdateAuthenticated"
+          component={UpdateAuthenticated}
+          options={{
+            headerTitle: " Account config",
           }}
         />
 
@@ -98,6 +105,13 @@ export default function App() {
         <Stack.Screen
           name="FolderLinks"
           component={FolderLinks}
+          options={({ navigation, route }) => ({
+            headerRight: () => (
+              <TouchableOpacity onPress={() => navigation.navigate("UserOptions")}>
+                <Icon name="person-circle-outline" size={40} color="#fff" />
+              </TouchableOpacity>
+            ),
+          })}
         />
 
       </Stack.Navigator>

@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
        
     },
     bodyGrey: {
-        backgroundColor: 'rgba(100,100,100,0.3)',
+        backgroundColor: 'rgba(210,210,210,0.3)',
         position: 'absolute',
         height: '100%',
         width: '100%',

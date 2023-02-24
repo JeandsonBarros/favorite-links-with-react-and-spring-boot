@@ -16,11 +16,11 @@ function CheckBox({ children, onChange, isChecked }) {
                 <Text>
                     {
                         isSelected ?
-                            <MaterialCommunityIcons size={25} color="aqua" name="checkbox-marked-outline" /> :
-                            <MaterialCommunityIcons size={25} color="aqua" name="checkbox-blank-outline" />
+                            <MaterialCommunityIcons size={25} color="#3694FF" name="checkbox-marked-outline" /> :
+                            <MaterialCommunityIcons size={25} color="#3694FF" name="checkbox-blank-outline" />
                     }
                 </Text>
-                <Text> {children} </Text>
+                <Text style={{fontWeight: '300'}}> {children} </Text>
             </View>
         </TouchableOpacity>);
 }

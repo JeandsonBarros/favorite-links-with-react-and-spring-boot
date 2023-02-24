@@ -18,7 +18,7 @@ function FolderLinks({ navigation, route }) {
     const [links, setLianks] = useState([])
     const [modalLinkVisible, setModalLinkVisible] = useState(false)
     const [loadVisible, setLoadVisible] = useState(false)
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
     const [favoriteLink, setFavoriteLink] = useState({ name: '', url: '' })
     const [search, setSearch] = useState('')
     const [folder, setFolder] = useState()
@@ -38,19 +38,19 @@ function FolderLinks({ navigation, route }) {
         if (typeof (data) === 'object')
             setLianks(data)
         else
-            return setAlert({ visible: true, text: data })
+            return setAlert({ visible: true, text: data, status: 'error' })
 
         if (typeof (dataFolder) === 'object')
             setFolder(dataFolder)
         else
-            return setAlert({ visible: true, text: dataFolder })
+            return setAlert({ visible: true, text: dataFolder, status: 'error' })
 
     }
 
     async function saveFavoriteLink() {
 
         if (!favoriteLink.name || !favoriteLink.url) {
-            return setAlert({ text: "Do not leave empty fields", visible: true })
+            return setAlert({ text: "Do not leave empty fields", visible: true, status: 'warning' })
         }
 
         setLoadVisible(true)
@@ -58,17 +58,22 @@ function FolderLinks({ navigation, route }) {
         setLoadVisible(false)
         setModalLinkVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
         getLinksByFolder()
+        setFavoriteLink({ name: '', url: '' })
     }
 
     async function updateFavoriteLink(name, url, folderId, id) {
+
+        if (!name || !url) {
+            return setAlert({ text: "Do not leave empty fields", visible: true, status: 'warning' })
+        }
 
         setLoadVisible(true)
         const data = await putFavoriteLink(name, url, folderId, id)
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
         getLinksByFolder()
 
     }
@@ -78,7 +83,7 @@ function FolderLinks({ navigation, route }) {
         const data = await deleteFavoriteLink(id)
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
         getLinksByFolder()
 
     }
@@ -95,7 +100,8 @@ function FolderLinks({ navigation, route }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: '', status: 'info' })}
             />
 
             <ScrollView style={{ width: '100%' }}>
@@ -110,30 +116,39 @@ function FolderLinks({ navigation, route }) {
                 visible={modalLinkVisible}
                 onClosed={() => setModalLinkVisible(false)}
             >
-                <Text style={{ fontSize: 25 }}>New favorite link</Text>
 
-                {
-                    loadVisible &&
-                    <ActivityIndicator size="large" />
-                }
+                <View>
 
-                <Input
-                    label="Name"
-                    placeholder="example"
-                    onChange={text => setFavoriteLink({ ...favoriteLink, name: text })}
-                />
-                <Input
-                    css={{ marginTop: 10 }}
-                    label="Link"
-                    placeholder="www.example.com"
-                    onChange={text => setFavoriteLink({ ...favoriteLink, url: text })}
-                />
-                <Button
-                    onPress={saveFavoriteLink}
-                    css={{ marginTop: 15 }}          
-                >
-                    <Text>Save</Text>
-                </Button>
+                    <Text style={{ fontSize: 25 }}>New favorite link</Text>
+
+                    {
+                        loadVisible &&
+                        <ActivityIndicator size="large" />
+                    }
+
+                    <Input
+                        css={{ marginTop: 10 }}
+                        label="Name"
+                        placeholder="example"
+                        onChange={text => setFavoriteLink({ ...favoriteLink, name: text })}
+                    />
+
+                    <Input
+                        css={{ marginTop: 10 }}
+                        label="Link"
+                        placeholder="www.example.com"
+                        onChange={text => setFavoriteLink({ ...favoriteLink, url: text })}
+                    />
+
+                    <Button
+                        onPress={saveFavoriteLink}
+                        css={{ marginTop: 15 }}
+                    >
+                        <Text>Save</Text>
+                    </Button>
+
+                </View>
+
             </ModalComponent>
 
             {

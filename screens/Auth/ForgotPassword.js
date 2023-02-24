@@ -14,13 +14,13 @@ function ForgotPassword({ navigation }) {
     const [newPassword, setNewPassword] = useState()
     const [confirmNewPassword, setConfirmNewPassword] = useState()
     const [recoveryCode, setRecoveryCode] = useState()
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
     const [emailIsSend, setEmailIsSend] = useState(false)
 
     async function sendEmail() {
 
         if (!email) {
-            setAlert({ visible: true, text: "Enter an email!" })
+            setAlert({ visible: true, text: "Enter an email!", status: 'warning' })
             return
         }
 
@@ -30,20 +30,20 @@ function ForgotPassword({ navigation }) {
 
         if (response === 201) {
             setEmailIsSend(true)
-            setAlert({ visible: true, text: "Email sent." })
+            setAlert({ visible: true, text: "Email sent.", status: 'success' })
             return
         }
 
-        setAlert({ visible: true, text: response })
+        setAlert({ visible: true, text: response, status: 'error' })
     }
 
     async function changePassword() {
 
         if (!email || !newPassword || !recoveryCode || !confirmNewPassword)
-            return setAlert({ visible: true, text: "Don't leave empty fields" })
+            return setAlert({ visible: true, text: "Don't leave empty fields", status: 'warning' })
 
         if (newPassword !== confirmNewPassword)
-            return setAlert({ visible: true, text: "Passwords do not match" })
+            return setAlert({ visible: true, text: "Passwords do not match", status: 'warning' })
 
         setVisibleActivityIndicator(true)
         const response = await changeForgottenPassword(email, newPassword, recoveryCode)
@@ -57,7 +57,7 @@ function ForgotPassword({ navigation }) {
             return
         }
 
-        setAlert({ visible: true, text: response })
+        setAlert({ visible: true, text: response, status: 'error' })
     }
 
     return (
@@ -66,7 +66,8 @@ function ForgotPassword({ navigation }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: '', status: 'info' })}
             />
 
             {visibleActivityIndicator &&
@@ -76,7 +77,7 @@ function ForgotPassword({ navigation }) {
                 emailIsSend ?
                     <View>
 
-                        <Text style={Styles.title}>Change Password</Text>
+                        <Text style={[Styles.title, { textAlign: 'center' }]}>Change Password</Text>
                         <Text style={{ textAlign: 'center' }}>
                             Enter your email, the code that
                             was sent to the email and the new password.
@@ -124,7 +125,7 @@ function ForgotPassword({ navigation }) {
                     :
                     <View>
 
-                        <Text style={Styles.title}>Send email</Text>
+                        <Text style={[Styles.title, { textAlign: 'center' }]}>Send email</Text>
                         <Text style={{ textAlign: 'center' }}>
                             Enter your email so that an email containing the
                             password reset code will be sent.

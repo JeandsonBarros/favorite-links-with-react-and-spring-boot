@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     modalView: {
         margin: 20,
         backgroundColor: 'white',
-        borderRadius: 20,
+        borderRadius: 10,
         padding: 35,
         alignItems: 'center',
         shadowColor: '#000',
@@ -64,11 +64,13 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+        fontWeight: '300',
     },
     modalTitle: {
         marginBottom: 25,
         textAlign: 'center',
         fontSize: 25,
+        fontWeight: '300',
     },
     footer: {
         flexDirection: 'row'

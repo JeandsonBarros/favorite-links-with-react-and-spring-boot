@@ -9,8 +9,7 @@ export default StyleSheet.create({
     padding: 10
   },
   listStyle: {
-    borderBottomWidth: 0.4,
-    borderBottomColor: 'grey',
+    width: '100%',
     padding: 10,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -18,7 +17,7 @@ export default StyleSheet.create({
   },
   textItemList: {
     fontSize: 20,
-    fontWeight: '200',
+    fontWeight: '300',
     marginLeft: 5,
   },
   shadow: {
@@ -58,10 +57,9 @@ export default StyleSheet.create({
     flexWrap: 'wrap'
   },
   title: {
-    textAlign: 'center',
     fontSize: 23,
     marginTop: 20,
-}
-  
+    fontWeight: '300',
+  }
 
 });

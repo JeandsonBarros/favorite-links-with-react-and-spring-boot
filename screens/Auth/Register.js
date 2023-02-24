@@ -13,7 +13,7 @@ function Register({ navigation }) {
 
     const [user, setUser] = useState({ email: '', password: '', name: '', confirmPassword: '' })
     const [visibleActivityIndicator, setVisibleActivityIndicator] = useState(false)
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
 
     function setValues(key, value) {
         let temp = { ...user }
@@ -24,10 +24,10 @@ function Register({ navigation }) {
     async function register() {
 
         if (!user.email || !user.password || !user.name || !user.confirmPassword)
-            return setAlert({ visible: true, text: "Do not leave empty fields!" })
+            return setAlert({ visible: true, text: "Do not leave empty fields!", status: 'warning' })
 
         if (user.password !== user.confirmPassword)
-            return setAlert({ visible: true, text: "Passwords do not match!" })
+            return setAlert({ visible: true, text: "Passwords do not match!", status: 'warning' })
 
         setVisibleActivityIndicator(true)
         const data = await userResgister(user.email, user.password, user.name)
@@ -36,7 +36,7 @@ function Register({ navigation }) {
         if (data === "authenticated")
             return navigation.navigate("Home")
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: 'error' })
 
     }
 
@@ -47,10 +47,11 @@ function Register({ navigation }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: 'info' })}
             />
 
-            <Icon name="user" size={90} color="aqua" />
+            <Icon name="user" size={90} color="#3694FF" />
             <Text style={{ fontSize: 40 }}>Register user</Text>
             <Text style={{ textAlign: 'center' }}>
                 Register to be able to save and manage your favorite links
@@ -93,12 +94,11 @@ function Register({ navigation }) {
 
             </View>
 
-            <View>
-
+            <View style={{ width: '90%'}}>
                 <Button text="Register" onPress={register}>
                     <Text>Register</Text>
                 </Button>
-                <Button text="Login" onPress={() => navigation.navigate("Login")}>
+                <Button css={{backgroundColor: 'purple'}} text="Login" onPress={() => navigation.navigate("Login")}>
                     <Text>Login</Text>
                 </Button>
 

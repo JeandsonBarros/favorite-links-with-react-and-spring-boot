@@ -16,7 +16,7 @@ function Login({ navigation }) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [visibleActivityIndicator, setVisibleActivityIndicator] = useState(false)
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
 
     useEffect(() => {
 
@@ -31,7 +31,7 @@ function Login({ navigation }) {
     async function userLogin() {
 
         if (!email || !password)
-            return setAlert({ visible: true, text: "Do not leave empty fields!" })
+            return setAlert({ visible: true, text: "Do not leave empty fields!", status: 'warning' })
 
         setVisibleActivityIndicator(true)
         const data = await login(email, password)
@@ -40,7 +40,7 @@ function Login({ navigation }) {
         if (data === "authenticated")
             return navigation.navigate("Home")
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: 'error' })
 
     }
 
@@ -50,12 +50,13 @@ function Login({ navigation }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: '', status: 'info'})}
             />
 
             {/* https://www.npmjs.com/package/react-native-vector-icons */}
             {/* https://oblador.github.io/react-native-vector-icons/ */}
-            <Icon name="user" size={90} color="aqua" />
+            <Icon name="user" size={90} color="#3694FF" />
             <Text style={{ fontSize: 40 }}>Login</Text>
 
             <Text style={{ textAlign: 'center' }}>
@@ -90,11 +91,11 @@ function Login({ navigation }) {
 
             </View>
 
-            <View>
+            <View style={{ width: '90%'}}>
                 <Button onPress={userLogin}>
                     <Text>Login</Text>
                 </Button>
-                <Button onPress={() => navigation.navigate("Register")}>
+                <Button css={{backgroundColor: 'purple'}} onPress={() => navigation.navigate("Register")}>
                     <Text>Register</Text>
                 </Button>
             </View>

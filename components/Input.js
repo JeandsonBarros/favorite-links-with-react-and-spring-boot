@@ -10,18 +10,26 @@ export default function Input({ value, onChange, placeholder, label, css, secure
 
     return (
         <View style={css}>
+
             <Text>{label}</Text>
+
             <TouchableOpacity
                 style={styles.view}
                 ref={viewRef}
                 onPress={() => inputRef.current.focus()}
             >
-                <View style={{alignItems: 'center', flexDirection: 'row'}}>
-                    <Text style={styles.rightIcon}>
-                        {icon}
-                    </Text>
+
+                <View style={{ flexDirection: 'row' }}>
+
+                    {
+                        icon &&
+                        <Text style={styles.leftIcon}>
+                            {icon}
+                        </Text>
+                    }
+
                     <TextInput
-                        style={styles.input}
+                        style={{ width: icon && secureTextEntry ? '80%' : icon || secureTextEntry ? '89%' : '100%', fontWeight: '300', }}
                         onChangeText={onChange}
                         value={value}
                         placeholder={placeholder}
@@ -31,22 +39,24 @@ export default function Input({ value, onChange, placeholder, label, css, secure
                             viewRef.current.setNativeProps({
                                 style:
                                 {
-                                    borderColor: 'aqua', borderWidth: 3
+                                    borderColor: 'aqua', borderWidth: 1
                                 }
                             });
                         }}
                         onBlur={() => {
                             viewRef.current.setNativeProps({
                                 style: {
-                                    borderColor: '#69edff', borderWidth: 2
+                                    borderColor: null, borderWidth: null
                                 }
                             });
                         }}
                     />
+
                 </View>
+
                 {
                     secureTextEntry &&
-                    <View style={{ flexDirection: 'row', position: 'absolute', right: 10 }}>
+                    <View style={{ width: '10%', flexDirection: 'row', position: 'absolute', right: 10 }}>
                         {visiblePassword ?
                             <TouchableOpacity onPress={() => setVisiblePassword(false)}>
                                 <Icon name="visibility-off" size={30} />
@@ -58,7 +68,9 @@ export default function Input({ value, onChange, placeholder, label, css, secure
                         }
                     </View>
                 }
+
             </TouchableOpacity>
+
         </View>
     );
 }
@@ -67,20 +79,20 @@ const styles = StyleSheet.create({
 
     view: {
         height: 55,
-        borderWidth: 2,
-        borderColor: '#69edff',
+        /* borderWidth: 2, */
+        /* borderColor: '#69edff', */
+        backgroundColor: 'rgb(225, 225, 225)',
         borderRadius: 10,
         padding: 10,
         flexDirection: 'row',
         alignItems: 'center',
         minWidth: '100%',
         maxWidth: '100%',
+        justifyContent: 'space-between',
     },
-    input: {
-        width: '91%',
-    },
-    rightIcon: {
-        marginRight: 5
+    leftIcon: {
+        marginRight: 5,
+        width: 30,
     }
 
 });

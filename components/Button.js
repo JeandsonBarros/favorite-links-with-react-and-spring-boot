@@ -15,7 +15,8 @@ export default function Button({ children, onPress, css }) {
 const styles = StyleSheet.create({
     text: {
         fontSize: 20,
-        color: '#fff'
+        color: '#fff',
+        fontWeight: '300',
     },
     defalteButton: {
         justifyContent: 'center',

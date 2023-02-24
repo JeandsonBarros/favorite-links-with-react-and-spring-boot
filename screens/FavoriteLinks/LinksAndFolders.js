@@ -1,3 +1,4 @@
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, BackHandler, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
@@ -38,7 +39,7 @@ export default function LinksAndFolders({ navigation }) {
     const [nameNewFolder, setNameNewFolder] = useState('')
     const [search, setSearch] = useState('')
     const [links, setLinks] = useState([])
-    const [alert, setAlert] = useState({ visible: false, text: '' })
+    const [alert, setAlert] = useState({ visible: false, text: '', status: 'info' })
 
     useEffect(() => {
 
@@ -68,9 +69,10 @@ export default function LinksAndFolders({ navigation }) {
         setLoadVisible(false)
 
         if (typeof (data) === 'object')
-            setLinks(data)
+            return setLinks(data)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: 'error' })
+
     }
 
     async function getListFolderLinks() {
@@ -88,15 +90,14 @@ export default function LinksAndFolders({ navigation }) {
             return
         }
 
-        setAlert({ visible: true, text: data })
-        getLinks()
+        setAlert({ visible: true, text: data, status: 'error' })
 
     }
 
     async function saveFavoriteLink() {
 
         if (!favoriteLink.name || !favoriteLink.url) {
-            return setAlert({ text: "Do not leave empty fields", visible: true })
+            return setAlert({ text: "Do not leave empty fields", visible: true, status: 'warning' })
         }
 
         setLoadVisible(true)
@@ -104,38 +105,44 @@ export default function LinksAndFolders({ navigation }) {
         setLoadVisible(false)
         setModalLinkVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
+        setFavoriteLink({ name: '', url: '' })
         getLinks()
+
     }
 
     async function updateFavoriteLink(name, url, folderId, id) {
 
         if (!name || !url) {
-            return setAlert({ text: "Do not leave empty fields", visible: true })
+            return setAlert({ text: "Do not leave empty fields", visible: true, status: 'warning' })
         }
 
         setLoadVisible(true)
         const data = await putFavoriteLink(name, url, folderId, id)
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
+        setFavoriteLink({ name: '', url: '' })
         getLinks()
 
     }
 
     async function removeFavoriteLink(id) {
+
         setLoadVisible(true)
         const data = await deleteFavoriteLink(id)
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
+        getLinks()
+
 
     }
 
     async function saveFolderLinks() {
 
         if (!nameNewFolder)
-            return setAlert({ visible: true, text: "Enter the folder name!" })
+            return setAlert({ visible: true, text: "Enter the folder name!", status: 'warning' })
 
         setLoadVisible(true)
         const data = await postFolderLinks(nameNewFolder)
@@ -144,8 +151,8 @@ export default function LinksAndFolders({ navigation }) {
 
         setModalFolderVisible(false)
 
-        setAlert({ visible: true, text: data })
-
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
+        setNameNewFolder('')
     }
 
     async function updateFolderLinks(newFolderName, id) {
@@ -156,7 +163,7 @@ export default function LinksAndFolders({ navigation }) {
         await getListFolderLinks()
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
     }
 
     async function removeFolderLinks(id) {
@@ -166,7 +173,7 @@ export default function LinksAndFolders({ navigation }) {
         await getListFolderLinks()
         setLoadVisible(false)
 
-        setAlert({ visible: true, text: data })
+        setAlert({ visible: true, text: data, status: data === 'Error' ? 'error' : 'success' })
     }
 
     return (
@@ -181,7 +188,8 @@ export default function LinksAndFolders({ navigation }) {
             <Alert
                 text={alert.text}
                 visible={alert.visible}
-                onClosed={() => setAlert({ visible: false, text: '' })}
+                status={alert.status}
+                onClosed={() => setAlert({ visible: false, text: 'info' })}
             />
 
             <ModalDown
@@ -189,51 +197,27 @@ export default function LinksAndFolders({ navigation }) {
                 onClosed={() => setModalDownVisible(false)}
             >
 
-                <View style={{ width: '100%' }}>
+                <View style={{ width: '100%', padding: 10 }}>
 
-                    <TouchableOpacity
+                    <Button
                         onPress={() => {
                             setModalDownVisible(false)
                             setModalLinkVisible(true)
                         }}
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            margin: 10
-                        }}>
+                    >
+                        <SimpleLineIcons size={20} name="plus" />
+                        <Text style={{ fontSize: 20 }}> New favorite link </Text>
+                    </Button>
 
-                        <SimpleLineIcons
-                            color="grey"
-                            size={30}
-                            name="plus"
-                        />
-
-                        <Text style={{ marginLeft: 5, fontSize: 25 }}>
-                            New favorite link
-                        </Text>
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
+                    <Button
                         onPress={() => {
                             setModalDownVisible(false)
                             setModalFolderVisible(true)
                         }}
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            margin: 10
-                        }}>
-
-                        <SimpleLineIcons
-                            color="grey"
-                            size={30}
-                            name="plus"
-                        />
-
-                        <Text style={{ marginLeft: 5, fontSize: 25 }}>New folder</Text>
-
-                    </TouchableOpacity>
+                    >
+                        <SimpleLineIcons size={20} name="plus" />
+                        <Text style={{ fontSize: 20 }}> New folder</Text>
+                    </Button>
 
                 </View>
 
@@ -243,50 +227,62 @@ export default function LinksAndFolders({ navigation }) {
                 visible={modalLinkVisible}
                 onClosed={() => setModalLinkVisible(false)}
             >
-                <Text style={{ fontSize: 25 }}>New favorite link</Text>
+                <View>
 
-                {
-                    loadVisible &&
-                    <ActivityIndicator size="large" />
-                }
+                    <Text style={{ fontSize: 25 }}>New favorite link</Text>
 
-                <Input
-                    label="Name"
-                    placeholder="example"
-                    onChange={text => setFavoriteLink({ ...favoriteLink, name: text })}
-                />
-                <Input
-                    css={{ marginTop: 10 }}
-                    label="URL"
-                    placeholder="www.example.com"
-                    onChange={text => setFavoriteLink({ ...favoriteLink, url: text })}
-                />
-                <Button
-                    onPress={saveFavoriteLink}
-                    css={{ marginTop: 15 }}
-                    text="Save"
-                >
-                    <Text>Save</Text>
-                </Button>
+                    {
+                        loadVisible &&
+                        <ActivityIndicator size="large" />
+                    }
+
+                    <Input
+                        css={{ marginTop: 10 }}
+                        label="Name"
+                        placeholder="example"
+                        onChange={text => setFavoriteLink({ ...favoriteLink, name: text })}
+                    />
+                    <Input
+                        css={{ marginTop: 10 }}
+                        label="URL"
+                        placeholder="www.example.com"
+                        onChange={text => setFavoriteLink({ ...favoriteLink, url: text })}
+                    />
+                    <Button
+                        onPress={saveFavoriteLink}
+                        css={{ marginTop: 15 }}
+                        text="Save"
+                    >
+                        <Text>Save</Text>
+                    </Button>
+
+                </View>
             </ModalComponent>
 
             <ModalComponent
                 visible={modalFolderVisible}
                 onClosed={() => setModalFolderVisible(false)}
             >
-                <Text style={{ fontSize: 25 }}>New folder</Text>
-                <Input
-                    value={nameNewFolder}
-                    onChange={setNameNewFolder}
-                    label="Folder name"
-                    placeholder="example"
-                />
-                <Button
-                    onPress={saveFolderLinks}
-                    css={{ marginTop: 15 }}
-                >
-                    <Text>Save</Text>
-                </Button>
+                <View>
+
+                    <Text style={{ fontSize: 25 }}>New folder</Text>
+
+                    <Input
+                        css={{ marginTop: 15 }}
+                        value={nameNewFolder}
+                        onChange={setNameNewFolder}
+                        label="Folder name"
+                        placeholder="example"
+                    />
+                    <Button
+                        onPress={saveFolderLinks}
+                        css={{ marginTop: 15 }}
+                    >
+                        <Text>Save</Text>
+                    </Button>
+
+                </View>
+
             </ModalComponent>
 
             <ScrollView style={{ width: '100%' }}>
@@ -314,11 +310,13 @@ export default function LinksAndFolders({ navigation }) {
                 />
             </TouchableOpacity>
 
+            <StatusBar style='auto' />
+
         </View>
     );
 }
 
-/* function Bollinha() {
+/* function Bolinha() {
 
     const [y, setY] = useState(200)
     const [x, setX] = useState(200)
