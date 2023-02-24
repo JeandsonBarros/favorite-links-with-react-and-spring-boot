@@ -40,6 +40,7 @@ public class WebSecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
                 .requestMatchers(HttpMethod.GET, "/user/list-all-users").hasAnyAuthority("ADMIN", "MASTER")
                 .requestMatchers(HttpMethod.DELETE, "/user/delete-one-user/{email}").hasAnyAuthority( "MASTER")
+                .requestMatchers(HttpMethod.PATCH, "/user/update-one-user/{email}").hasAnyAuthority( "MASTER")
                 .anyRequest().authenticated()
                 .and()
                 .cors()

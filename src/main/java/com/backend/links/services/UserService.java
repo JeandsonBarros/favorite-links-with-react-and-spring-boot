@@ -24,10 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -40,13 +37,21 @@ public class UserService {
     private PasswordEncoder encoder;
     @Autowired
     private JWTSecurityConfig jwtSecurityConfig;
-
     @Autowired
     private LinksFolderRepository linksFolderRepository;
 
     public ResponseEntity<Object> getAllUsers(Pageable pageable) {
         try {
             return new ResponseEntity<>(userAuthRepository.findAll(pageable), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Object> findUsersByName(String name, Pageable pageable) {
+        try {
+            return new ResponseEntity<>(userAuthRepository.findByNameContaining(name, pageable), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -96,13 +101,13 @@ public class UserService {
         try {
 
             if(userAuthRepository.findByEmail(userDTO.getEmail()).isPresent())
-                return new ResponseEntity<>("There is already a registered user with this email", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("There is already a registered user with this email: "+userDTO.getEmail(), HttpStatus.BAD_REQUEST);
 
             UserAuth newUser = new UserAuth();
             BeanUtils.copyProperties(userDTO, newUser);
             newUser.setPassword(encoder.encode(userDTO.getPassword()));
             Optional<Role> roleUser = roleRepository.findByRole(RoleEnum.USER.toString());
-            newUser.setRoles(List.of(roleUser.get()));
+            newUser.setRoles(Set.of(roleUser.get()));
 
             newUser = userAuthRepository.save(newUser);
 
@@ -186,11 +191,55 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<Object> updateOneUser(String email, UserDTO userDTO) {
+        try {
+
+            Optional<UserAuth> user = userAuthRepository.findByEmail(email);
+
+            if(!user.isPresent())
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+
+            if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+
+                Optional<UserAuth> exitUser = userAuthRepository.findByEmail(userDTO.getEmail());
+
+                if (exitUser.isPresent() && !exitUser.get().getEmail().equals(email)) {
+                    return new ResponseEntity<>("This email is unavailable", HttpStatus.BAD_REQUEST);
+                } else {
+                    user.get().setEmail(userDTO.getEmail());
+                }
+            }
+
+            if (userDTO.getName() != null && !userDTO.getName().isEmpty())
+                user.get().setName(userDTO.getName());
+
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty())
+                user.get().setPassword(encoder.encode(userDTO.getPassword()));
+
+            if(userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()){
+                Set<Role> roles = new HashSet<>();
+                userDTO.getRoles().forEach(role->{
+                    Optional<Role> roleEnity = roleRepository.findByRole(role);
+                    roleEnity.ifPresent(roles::add);
+                });
+                if(!roles.isEmpty())
+                    user.get().setRoles(roles);
+            }
+
+            userAuthRepository.save(user.get());
+
+            return new ResponseEntity<>("Successfully updated", HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public UserAuth getUserDataLogged() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<UserAuth> userEntity = userAuthRepository.findByEmail(auth.getName());
         return userEntity.get();
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.backend.links.services;
 
+import com.backend.links.dto.LinksFolderDTO;
 import com.backend.links.models.FavoriteLink;
 import com.backend.links.models.LinksFolder;
 import com.backend.links.models.UserAuth;
@@ -147,5 +148,19 @@ public class LinksFolderService {
         }
     }
 
+    public ResponseEntity<Object> findLinkInFolder(String folderName, String nameLink) {
+        try {
 
+            UserAuth userAuth = userService.getUserDataLogged();
+            Optional<LinksFolder> linksFolder = linksFolderRepository.findByUserAuthAndName(userAuth, folderName);
+
+            if(!linksFolder.isPresent())
+                return new ResponseEntity<>("folder "+folderName+" not found", HttpStatus.NOT_FOUND);
+
+            return new ResponseEntity<>(favoriteLinkRepository.findByUserAuthAndLinksFolderAndNameContaining(userAuth, linksFolder.get(), nameLink), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

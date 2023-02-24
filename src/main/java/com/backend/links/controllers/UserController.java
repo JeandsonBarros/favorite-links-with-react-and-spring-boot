@@ -32,9 +32,13 @@ public class UserController {
     @Operation(summary = "Get all users | Authority: ADMIN, MASTER")
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/list-all-users")
-    public ResponseEntity<Object> getAllUsers(@PageableDefault(size = 30, page = 0) Pageable paging){
+    public ResponseEntity<Object> getAllUsers(@PageableDefault(size = 30, page = 0) Pageable paging, @RequestParam(required = false) String name){
+
         Pageable pageable = PageRequest.of(paging.getPageNumber(), paging.getPageSize(), Sort.by(
                 Sort.Order.asc("name")));
+
+        if(name != null && !name.isEmpty())
+            return userService.findUsersByName(name, pageable);
 
         return userService.getAllUsers(pageable);
     }
@@ -101,6 +105,18 @@ public class UserController {
     @DeleteMapping("/delete-one-user/{email}")
     public ResponseEntity<Object> deleteOneUser(@PathVariable String email) {
         return userService.deleteOneUser(email);
+    }
+
+    @Operation(summary = "Update account of one user by email | Authority: MASTER")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PatchMapping("/update-one-user/{email}")
+    public ResponseEntity<Object> updateOneUser(@Valid @PathVariable String email, @Valid @RequestBody UserDTO userDTO, BindingResult result) {
+
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty())
+            if (result.hasFieldErrors("email"))
+                return new ResponseEntity<>("must be a well-formed email address", HttpStatus.BAD_REQUEST);
+
+        return userService.updateOneUser(email, userDTO);
     }
 
     public ResponseEntity<Object> listErrors(BindingResult result) {

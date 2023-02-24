@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class RoleConfigure implements CommandLineRunner {
@@ -48,15 +49,15 @@ public class RoleConfigure implements CommandLineRunner {
                 }
             });
 
-            Optional<UserAuth> userEntity = userAuthRepository.findByEmail("geoo677@gmail.com");
+            Optional<UserAuth> userEntity = userAuthRepository.findByEmail("master@email.com");
             if (!userEntity.isPresent()) {
 
                 UserAuth newUser = new UserAuth();
-                newUser.setName("Jeandson Barros");
-                newUser.setEmail("geoo677@gmail.com");
+                newUser.setName("Master");
+                newUser.setEmail("master@email.com");
                 newUser.setPassword(encoder.encode("zorosola"));
                 Optional<Role> roleMaster = roleRepository.findByRole(RoleEnum.MASTER.toString());
-                newUser.setRoles(List.of(roleMaster.get()));
+                newUser.setRoles(Set.of(roleMaster.get()));
                 newUser = userAuthRepository.save(newUser);
 
                 LinksFolder linksFolder = new LinksFolder();

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tab_user")
@@ -20,14 +22,9 @@ public class UserAuth {
     @JsonIgnore
     @Column(nullable = false)
     private String password;
-
-    //@ElementCollection(fetch = FetchType.EAGER)
-    //@CollectionTable(name = "tab_user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    /*private List<String> roles = new ArrayList<>();*/
-
     @ManyToMany(fetch = FetchType.EAGER)
     @Column(name = "role_id")
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -53,11 +50,11 @@ public class UserAuth {
         this.password = password;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
